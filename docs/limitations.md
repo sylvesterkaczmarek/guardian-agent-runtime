@@ -6,6 +6,10 @@ The environments are small deterministic simulators. The Guardian and tools run 
 
 Replay caches, consumed nonces, revocation state, invocation budgets, policy rate-limit state, and resource budgets are process-local in this reference implementation. A deployment that preserves signing authority across restarts must persist monotonic security state or invalidate the prior permit/session epoch on restart. The benchmark does not claim restart-safe replay protection.
 
+Authorization is intentionally reservation-based. Once a valid request passes capability, policy, and invariant checks, its nonce and invocation authority are consumed and its policy rate/resource budget is recorded before tool execution. A caller that obtains valid permits and never executes them can therefore reduce availability. Reclaiming abandoned reservations safely would require a durable transaction or lease protocol that this reference implementation does not provide.
+
+The reference dependency lock fixes package versions and installs with resolution disabled, but it does not include distribution-artifact hashes. The repository therefore does not claim cryptographic provenance for every third-party wheel or source archive. CI action dependencies are separately pinned to full commit SHAs.
+
 The hardened Guardian blocks the included fixed and seeded attack distribution. This does not establish completeness against unknown attack classes.
 
 The defensive loop is bounded and review-gated. It minimizes discovered traces, constructs and evaluates a generalized candidate, and requires that candidate to match the reviewed checked policy before retention. It does not synthesize arbitrary verified policies.

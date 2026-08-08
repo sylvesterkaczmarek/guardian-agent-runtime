@@ -144,6 +144,9 @@ class GuardianRuntime:
             normalized = canonicalize_request(request)
         except CanonicalizationError as exc:
             return Decision(False, f"canonicalization failed: {exc}")
+        except Exception as exc:
+            error_type = f"{type(exc).__module__}.{type(exc).__qualname__}"
+            return Decision(False, f"canonicalization failed safely: {error_type}")
 
         state = self.environment.snapshot()
         capability_ok, capability_reason = self.capabilities.validate(normalized, now, consume=False)

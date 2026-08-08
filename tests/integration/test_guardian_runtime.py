@@ -321,3 +321,122 @@ def test_initial_guardian_preserves_deliberate_direct_proxy_flaw_for_comparison(
     assert runtime.environment.state.proxy_invocations == 1
     assert runtime.gateway.execution_count == 1
     assert len(runtime.evidence.events) == 1
+
+
+def test_unsupported_request_value_fails_closed_and_evidence_remains_verifiable():
+    from guardian_runtime.evidence import verify_evidence_bundle
+
+    runtime, _, _ = build_guardian("sandbox", hardened=True)
+    malformed = ActionRequest(
+        subject="agent-1",
+        session_id="s",
+        tool="sandbox",
+        action="read_file",
+        resource="/tmp/input.txt",
+        params={"opaque": object()},
+        purpose="operations",
+        capability_id="cap-read-tmp",
+        nonce="unsupported-value",
+    )
+
+    decision, result = runtime.execute_request(malformed)
+
+    assert not decision.allowed and result is None
+    assert "canonicalization failed" in decision.reason
+    assert runtime.gateway.execution_count == 0
+    assert len(runtime.evidence.events) == 1
+    assert runtime.evidence.events[0].requested_action["params"]["opaque"] == {
+        "invalid_type": "builtins.object"
+    }
+    bundle = runtime.evidence.export_bundle(policy_version=runtime.policy.version)
+    assert verify_evidence_bundle(
+        bundle,
+        runtime.public_key,
+        expected_policy_version=runtime.policy.version,
+        expected_manifest_hash=runtime.runtime_manifest_hash,
+    ) == (True, "evidence bundle valid")
+
+
+def test_noncanonical_tool_output_cannot_break_execution_evidence(monkeypatch):
+    from guardian_runtime.evidence import verify_evidence_bundle
+    from guardian_runtime.types import ToolResult
+
+    runtime, _, _ = build_guardian("sandbox", hardened=True)
+
+    def hostile_execute(_request):
+        return ToolResult(
+            True,
+            "hostile-output",
+            output={"opaque": object()},
+            state_version=runtime.environment.snapshot().version,
+        )
+
+    monkeypatch.setattr(runtime.environment, "execute", hostile_execute)
+    valid = ActionRequest(
+        subject="agent-1",
+        session_id="s",
+        tool="sandbox",
+        action="read_file",
+        resource="/tmp/input.txt",
+        purpose="operations",
+        capability_id="cap-read-tmp",
+        nonce="hostile-output",
+    )
+
+    decision, result = runtime.execute_request(valid)
+
+    assert decision.allowed and result and result.ok
+    assert len(runtime.evidence.events) == 1
+    assert runtime.evidence.events[0].result_digest
+    bundle = runtime.evidence.export_bundle(policy_version=runtime.policy.version)
+    assert verify_evidence_bundle(
+        bundle,
+        runtime.public_key,
+        expected_policy_version=runtime.policy.version,
+        expected_manifest_hash=runtime.runtime_manifest_hash,
+    ) == (True, "evidence bundle valid")
+
+
+def test_hostile_mapping_implementation_fails_closed_and_is_evidenced():
+    from collections.abc import Mapping
+
+    from guardian_runtime.evidence import verify_evidence_bundle
+
+    class HostileMapping(Mapping):
+        def __getitem__(self, key):
+            raise RuntimeError("hostile mapping access")
+
+        def __iter__(self):
+            raise RuntimeError("hostile mapping iteration")
+
+        def __len__(self):
+            return 1
+
+    runtime, _, _ = build_guardian("sandbox", hardened=True)
+    malformed = ActionRequest(
+        subject="agent-1",
+        session_id="s",
+        tool="sandbox",
+        action="read_file",
+        resource="/tmp/input.txt",
+        params=HostileMapping(),
+        purpose="operations",
+        capability_id="cap-read-tmp",
+        nonce="hostile-mapping",
+    )
+
+    decision, result = runtime.execute_request(malformed)
+
+    assert not decision.allowed and result is None
+    assert decision.reason == "canonicalization failed safely: builtins.RuntimeError"
+    assert runtime.gateway.execution_count == 0
+    assert len(runtime.evidence.events) == 1
+    invalid = runtime.evidence.events[0].requested_action["params"]["invalid_mapping"]
+    assert invalid["access_error"] == "builtins.RuntimeError"
+    bundle = runtime.evidence.export_bundle(policy_version=runtime.policy.version)
+    assert verify_evidence_bundle(
+        bundle,
+        runtime.public_key,
+        expected_policy_version=runtime.policy.version,
+        expected_manifest_hash=runtime.runtime_manifest_hash,
+    ) == (True, "evidence bundle valid")

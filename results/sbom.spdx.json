@@ -7,7 +7,7 @@
     ]
   },
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/sbom/0.3.0/reference-v3",
+  "documentNamespace": "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/sbom/0.3.1/reference-v3",
   "name": "guardian-agent-runtime-reference-sbom",
   "packages": [
     {
@@ -17,7 +17,7 @@
       "licenseConcluded": "MIT",
       "name": "guardian-agent-runtime",
       "primaryPackagePurpose": "APPLICATION",
-      "versionInfo": "0.3.0"
+      "versionInfo": "0.3.1"
     },
     {
       "SPDXID": "SPDXRef-Package-setuptools",

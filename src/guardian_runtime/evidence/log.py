@@ -35,24 +35,108 @@ class EvidenceCheckpoint:
         return data
 
 
-def _safe_value(value: Any) -> Any:
+def _type_name(value: Any) -> str:
+    value_type = type(value)
+    return f"{value_type.__module__}.{value_type.__qualname__}"
+
+
+def _safe_mapping_key(key: Any) -> dict[str, Any]:
+    """Return a deterministic, JSON-safe description of an invalid mapping key."""
+
     import math
 
-    if isinstance(value, float) and not math.isfinite(value):
+    if key is None or isinstance(key, (bool, int, str)):
+        return {"type": _type_name(key), "value": key}
+    if isinstance(key, float):
+        if math.isfinite(key):
+            return {"type": _type_name(key), "value": key}
+        return {"type": _type_name(key), "invalid_float": repr(key)}
+    if isinstance(key, bytes):
+        return {"type": _type_name(key), "hex": key.hex()}
+    return {"type": _type_name(key), "unsupported": True}
+
+
+def _safe_value(value: Any) -> Any:
+    """Convert untrusted values into a deterministic JSON-safe evidence representation.
+
+    Evidence generation must not become a second failure path after a malformed request or
+    hostile tool result has already crossed the audit boundary. Unsupported Python objects
+    are represented by type rather than ``repr`` so memory addresses or custom repr output
+    cannot make reference evidence nondeterministic.
+    """
+
+    import math
+
+    if value is None or isinstance(value, (bool, int, str)):
+        return value
+    if isinstance(value, float):
+        if math.isfinite(value):
+            return value
         return {"invalid_float": repr(value)}
-    if isinstance(value, dict):
-        if all(isinstance(key, str) and key for key in value):
-            return {key: _safe_value(item) for key, item in value.items()}
-        items = sorted(value.items(), key=lambda pair: repr(pair[0]))
-        return {
-            "invalid_mapping": [
-                {"key_repr": repr(key), "value": _safe_value(item)}
-                for key, item in items
-            ]
-        }
+    if isinstance(value, bytes):
+        return {"bytes_hex": value.hex()}
+    if isinstance(value, bytearray):
+        return {"bytearray_hex": bytes(value).hex()}
+    if isinstance(value, memoryview):
+        return {"memoryview_hex": value.tobytes().hex()}
+    if isinstance(value, Mapping):
+        try:
+            mapping_items = list(value.items())
+        except Exception as exc:
+            return {
+                "invalid_mapping": {
+                    "type": _type_name(value),
+                    "access_error": _type_name(exc),
+                }
+            }
+        if all(isinstance(key, str) and key for key, _ in mapping_items):
+            return {key: _safe_value(item) for key, item in mapping_items}
+        entries = [
+            {"key": _safe_mapping_key(key), "value": _safe_value(item)}
+            for key, item in mapping_items
+        ]
+        entries.sort(key=lambda entry: canonical_json(entry["key"]))
+        return {"invalid_mapping": entries}
     if isinstance(value, (list, tuple)):
-        return [_safe_value(v) for v in value]
-    return value
+        return [_safe_value(item) for item in value]
+    if isinstance(value, (set, frozenset)):
+        items = [_safe_value(item) for item in value]
+        items.sort(key=canonical_json)
+        return {"unordered_values": items, "type": _type_name(value)}
+    return {"invalid_type": _type_name(value)}
+
+
+def _request_snapshot(request: ActionRequest) -> dict[str, Any]:
+    """Capture the original request without dataclasses.asdict deep-copying untrusted values."""
+
+    return {
+        "subject": _safe_value(request.subject),
+        "session_id": _safe_value(request.session_id),
+        "tool": _safe_value(request.tool),
+        "action": _safe_value(request.action),
+        "resource": _safe_value(request.resource),
+        "params": _safe_value(request.params),
+        "purpose": _safe_value(request.purpose),
+        "capability_id": _safe_value(request.capability_id),
+        "nonce": _safe_value(request.nonce),
+        "observed_state_version": _safe_value(request.observed_state_version),
+        "context": _safe_value(request.context),
+    }
+
+
+def _result_snapshot(result: ToolResult) -> dict[str, Any]:
+    return {
+        "ok": _safe_value(result.ok),
+        "status": _safe_value(result.status),
+        "output": _safe_value(result.output),
+        "state_version": _safe_value(result.state_version),
+    }
+
+
+def _safe_identifier(value: Any) -> str:
+    if isinstance(value, str):
+        return value
+    return f"<invalid:{_type_name(value)}>"
 
 
 class EvidenceLog:
@@ -77,19 +161,19 @@ class EvidenceLog:
         sequence = len(self._events) + 1
         previous_hash = self._events[-1].event_hash if self._events else GENESIS_HASH
         normalized = decision.normalized_request.to_dict() if decision.normalized_request else None
-        result_digest = digest_json(asdict(result)) if result is not None else ""
+        result_digest = digest_json(_result_snapshot(result)) if result is not None else ""
         payload = {
             "sequence": sequence,
             "timestamp": timestamp,
-            "session_id": request.session_id,
-            "subject": request.subject,
-            "requested_action": _safe_value(request.to_dict()),
+            "session_id": _safe_identifier(request.session_id),
+            "subject": _safe_identifier(request.subject),
+            "requested_action": _request_snapshot(request),
             "normalized_action": normalized,
             "decision": "allow" if decision.allowed else "deny",
             "decision_reason": decision.reason,
             "rule_id": decision.rule_id,
             "policy_version": policy_version,
-            "capability_id": request.capability_id,
+            "capability_id": _safe_identifier(request.capability_id),
             "runtime_manifest_hash": self._manifest_hash,
             "result_digest": result_digest,
             "previous_hash": previous_hash,

@@ -367,7 +367,7 @@ guardian-agent-runtime/
 
 The deterministic reference suite uses fixed seeds `7`, `17`, `29`, `41`, and `53`, frozen benchmark configuration, deterministic scenario generation, deterministic reference-only signing keys, an exact reference dependency lock, machine-readable outputs, checksums, and CI reproduction checks. `make install`, Docker, and CI install the locked package set with dependency resolution disabled and then run `pip check`, so an omitted dependency fails validation rather than being silently resolved. The signed runtime manifest includes SHA-256 hashes of the selected policy, capability configuration, and packaged Guardian source. The reference summary additionally hashes the research source that defines the implementation, experiments, formal artifacts, and generation scripts. `GUARDIAN_BUILD_ID` can be set by a release pipeline to record an external commit or build identifier without making the checked reference outputs self-referential.
 
-The Python package carries its reference YAML resources inside the wheel, so `build_guardian()` works from an installed wheel rather than depending on repository-relative config paths. The checked dependency inventory includes the exact package set and dependency graph for the reference CPython 3.12/3.13 Linux environment, and the generated SPDX SBOM represents project-to-direct and package-to-transitive relationships. CI also performs dependency review and vulnerability auditing.
+The Python package carries its reference YAML resources inside the wheel, so `build_guardian()` works from an installed wheel rather than depending on repository-relative config paths. The checked dependency inventory includes the exact package set and dependency graph for the reference CPython 3.12/3.13 Linux environment, and the generated SPDX SBOM represents project-to-direct and package-to-transitive relationships. CI also performs dependency review and vulnerability auditing. External GitHub Actions used by CI are pinned to verified full-length release commit SHAs rather than movable tags.
 
 Reference signing keys exist only to make the research artifact reproducible. They must not be used as production secrets.
 
@@ -380,6 +380,10 @@ This repository implements software-signed runtime manifests. It does not claim 
 The Guardian and simulators currently run in one Python process. A production boundary would require stronger process or memory isolation, protected key storage, stronger supply-chain assurance, and possibly hardware-rooted attestation. The bundled policy and capability YAML parsers do reject duplicate keys and malformed schema input, but this remains a research parser rather than a hardened production parser.
 
 Replay caches, capability nonces and revocations, invocation budgets, policy rate limits, and resource-budget state are process-local. A deployment that keeps signing authority across restarts must persist monotonic security state or invalidate the previous permit/session epoch. This repository does not claim restart-safe replay protection.
+
+Authorization reserves nonce, invocation, rate-limit, and resource-budget authority before a permit is executed. If a caller obtains valid permits and abandons them, those reservations can reduce later availability. The reference implementation chooses conservative one-way reservation over reclaiming authority without a durable transaction protocol.
+
+`requirements.lock` pins the reference package versions and disables dependency resolution, but it does not pin distribution-artifact hashes. Release-grade dependency artifact provenance remains outside the current reproducibility claim.
 
 Compromised tools, compromised signing keys, compromised host operating systems, covert channels, side channels, and hardware attacks remain important limits or out-of-scope adversaries. The negative-result experiments make two of those boundaries concrete.
 
