@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/dependency-review-action@v5
+
+  vulnerability-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pypa/gh-action-pip-audit@v1.1.0
+        with:
+          inputs: requirements.lock
+          no-deps: true
+          disable-pip: true
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements.lock
+      - run: python -m pip install --no-deps -r requirements.lock
+      - run: python -m pip install --no-deps --no-build-isolation -e .
+      - run: python -m pip check
+      - run: ruff check src tests experiments scripts formal
+      - run: mypy src/guardian_runtime
+      - run: pytest
+      - run: python formal/check_model.py
+      - if: matrix.python-version == '3.12'
+        name: Model-check TLA+ specification
+        run: |
+          curl --fail --location --silent --show-error \
+            https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar \
+            --output /tmp/tla2tools.jar
+          echo "bee4a54f3ee3d4afc347c3240ec2d9e93b075104  /tmp/tla2tools.jar" | sha1sum --check --strict
+          java -XX:+UseParallelGC -cp /tmp/tla2tools.jar tlc2.TLC \
+            -workers 1 -config formal/guardian.cfg formal/guardian.tla
+      - run: python -m experiments.attack_suite
+      - if: matrix.python-version == '3.12'
+        run: |
+          python -m experiments.run_reference_suite
+          git diff --exit-code -- results
+      - if: matrix.python-version == '3.12'
+        run: |
+          python -m pip wheel . --no-deps --no-build-isolation -w dist
+          mkdir -p /tmp/guardian-wheel-test
+          python -m pip install --no-deps --target /tmp/guardian-wheel-test dist/*.whl
+          cd /tmp
+          PYTHONPATH=/tmp/guardian-wheel-test python - <<'PY'
+          from guardian_runtime.factory import build_guardian
+          from guardian_runtime.types import ActionRequest
+
+          runtime, _, _ = build_guardian("mission", hardened=True)
+          request = ActionRequest(
+              subject="agent-1",
+              session_id="wheel-smoke",
+              tool="mission",
+              action="observe_telemetry",
+              purpose="operations",
+              capability_id="cap-observe",
+              nonce="wheel-smoke",
+          )
+          decision, result = runtime.execute_request(request)
+          assert decision.allowed and result and result.ok
+
+          sandbox, _, _ = build_guardian("sandbox", hardened=True)
+          proxy = ActionRequest(
+              subject="agent-1",
+              session_id="wheel-proxy-smoke",
+              tool="sandbox",
+              action="proxy_call",
+              params={
+                  "target": "read_file",
+                  "target_params": {},
+                  "target_resource": "/tmp/input.txt",
+                  "nested_capability_id": "cap-read-tmp",
+              },
+              purpose="operations",
+              capability_id="cap-proxy",
+              nonce="wheel-proxy-smoke",
+          )
+          proxy_decision, proxy_result = sandbox.execute_request(proxy)
+          assert proxy_decision.allowed and proxy_result and proxy_result.ok
+          assert proxy_result.status == "proxied-mediated"
+          assert sandbox.gateway.execution_count == 2
+          assert sandbox.environment.state.proxy_invocations == 0
+          assert len(sandbox.evidence.events) == 2
+          PY

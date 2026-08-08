@@ -1,0 +1,8 @@
+seeds: [7, 17, 29, 41, 53]
+reference_time: 2000000000
+generated_attack_cases_per_seed: 24
+architectures:
+  - no_guardian
+  - static_acl
+  - guardian_initial
+  - guardian_hardened

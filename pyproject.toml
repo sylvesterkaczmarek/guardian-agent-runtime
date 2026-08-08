@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "guardian-agent-runtime"
+version = "0.3.0"
+description = "Reference monitor and adversarial benchmark for securing privileged actions by agentic systems."
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [{name = "Sylvester Kaczmarek"}]
+dependencies = [
+  "cryptography>=46,<47",
+  "PyYAML>=6,<7",
+  "numpy>=2,<3",
+  "matplotlib>=3.10,<4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "hypothesis>=6.130,<7",
+  "mypy>=1.15,<2",
+  "pytest>=8.3,<9",
+  "pytest-cov>=6,<7",
+  "ruff>=0.11,<1",
+]
+
+[project.scripts]
+guardian-verify = "guardian_runtime.verifier.cli:main"
+guardian-verify-manifest = "guardian_runtime.verifier.manifest_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "UP", "B"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+no_implicit_optional = true
+exclude = ["tests"]
+
+[tool.setuptools.package-data]
+"guardian_runtime.resources" = ["guardian/*.yaml", "capabilities/*.yaml", "benchmarks/*.yaml"]

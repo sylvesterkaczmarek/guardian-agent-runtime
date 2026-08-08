@@ -1,0 +1,23 @@
+{
+  "manifest": {
+    "attestation": "software-signed-manifest-only",
+    "benchmark_configuration": "reference-v3",
+    "benchmark_configuration_hash": "799d67d10ef50cf213593c0e287d7ea0825140f30e842bfdda17093d32b85a2c",
+    "build_identifier": "source-sha256:a73d7db1530a027b",
+    "configuration_hash": "a5448eedb5222d7b9f31515c4088e5be40e5eee983a9bfcd6d6e72fc9e00421c",
+    "guardian_version": "0.3.0",
+    "nested_action_mediation": "guardian-recursive",
+    "permitted_tools": [
+      "mission"
+    ],
+    "policy_hash": "a12ced707f570117db194757e85990de7bb33e1d3d4fab4cba76a229928ecae5",
+    "policy_version": "1.2-hardened",
+    "source_package_sha256": "a73d7db1530a027b7968147d13cf3854f684d765cf5b725c5f98c2e525b6841d",
+    "tool_versions": {
+      "mission": "sim-3"
+    }
+  },
+  "manifest_hash": "1340fb0e7fd55852f0fcc9fa4328c1af7fd670bc56207c378a3332416dc042de",
+  "public_key": "/1nHzTFa34/iPboleyWvBTV1PQLMY425lWdgOAUoJ74=",
+  "signature": "zb9h3iolQONQNJD1OvEIRRNTpgeSBvn99lSM7ITLZK+mfkj3rx9kyxCBc9iAsWlc5uqeOUuRwcJQ22e8BdxiBQ=="
+}

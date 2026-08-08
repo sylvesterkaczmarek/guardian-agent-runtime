@@ -1,0 +1,207 @@
+capabilities:
+- capability_id: cap-observe
+  subject: agent-1
+  tool: mission
+  action: observe_telemetry
+  resource: '*'
+  max_invocations: 100
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-point
+  subject: agent-1
+  tool: mission
+  action: point_payload
+  resource: '*'
+  constraints:
+    angle_deg:
+      min: -20
+      max: 20
+      required: true
+  max_invocations: 20
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-power
+  subject: agent-1
+  tool: mission
+  action: change_power
+  resource: '*'
+  constraints:
+    allocation:
+      min: 0
+      max: 70
+      required: true
+  max_invocations: 20
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-maneuver
+  subject: agent-1
+  tool: mission
+  action: maneuver
+  resource: '*'
+  constraints:
+    delta_v:
+      min: -3
+      max: 3
+      required: true
+  max_invocations: 10
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-safe-mode
+  subject: agent-1
+  tool: mission
+  action: enter_safe_mode
+  resource: '*'
+  max_invocations: 10
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-schedule
+  subject: agent-1
+  tool: mission
+  action: schedule_activity
+  resource: '*'
+  constraints:
+    activity:
+      enum:
+      - science
+      - maneuver
+      required: true
+    activity_params:
+      required: true
+  max_invocations: 20
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-restricted
+  subject: controller-1
+  tool: mission
+  action: restricted_command
+  resource: '*'
+  constraints:
+    authorization:
+      enum:
+      - critical
+      required: true
+  max_invocations: 2
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-read-tmp
+  subject: agent-1
+  tool: sandbox
+  action: read_file
+  resource: /tmp/*
+  max_invocations: 100
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-write-tmp
+  subject: agent-1
+  tool: sandbox
+  action: write_file
+  resource: /tmp/*
+  constraints:
+    content: {}
+  max_invocations: 20
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-network-safe
+  subject: agent-1
+  tool: sandbox
+  action: network_call
+  resource: '*'
+  constraints:
+    target:
+      prefix: mock://safe/
+      required: true
+  max_invocations: 10
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-actuator
+  subject: agent-1
+  tool: sandbox
+  action: actuator_set
+  resource: '*'
+  constraints:
+    value:
+      min: -5
+      max: 5
+      required: true
+  max_invocations: 10
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-proxy
+  subject: agent-1
+  tool: sandbox
+  action: proxy_call
+  resource: '*'
+  constraints:
+    target:
+      enum:
+      - read_file
+      - secret_read
+      - network_call
+      - actuator_set
+      required: true
+    target_params:
+      required: true
+    target_resource:
+      required: true
+    nested_capability_id:
+      enum:
+      - cap-read-tmp
+      - cap-network-safe
+      - cap-actuator
+      required: true
+  max_invocations: 10
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-one-shot
+  subject: agent-1
+  tool: sandbox
+  action: actuator_set
+  resource: '*'
+  constraints:
+    value:
+      min: -2
+      max: 2
+      required: true
+  max_invocations: 1
+  expires_at: 2000001000
+  purpose:
+  - operations
+- capability_id: cap-expired
+  subject: agent-1
+  tool: sandbox
+  action: actuator_set
+  resource: '*'
+  constraints:
+    value:
+      min: -10
+      max: 10
+      required: true
+  max_invocations: 5
+  expires_at: 1999999999
+- capability_id: cap-parent
+  subject: agent-1
+  tool: sandbox
+  action: read_file
+  resource: /tmp/*
+  max_invocations: 20
+  delegation_depth: 2
+  expires_at: 2000001000
+  purpose:
+  - operations
+  constraints:
+    format:
+      enum:
+      - text
+      required: true

@@ -1,0 +1,67 @@
+version: 1.0-initial
+default: deny
+rules:
+- id: deny-protected-writes
+  effect: deny
+  tool: sandbox
+  action: write_file
+  resource: /guardian/*
+- id: allow-mission-observe
+  effect: allow
+  tool: mission
+  action: observe_telemetry
+- id: allow-mission-point
+  effect: allow
+  tool: mission
+  action: point_payload
+- id: allow-mission-power
+  effect: allow
+  tool: mission
+  action: change_power
+- id: allow-mission-maneuver
+  effect: allow
+  tool: mission
+  action: maneuver
+- id: allow-safe-mode
+  effect: allow
+  tool: mission
+  action: enter_safe_mode
+- id: allow-scheduling
+  effect: allow
+  tool: mission
+  action: schedule_activity
+- id: allow-restricted
+  effect: allow
+  tool: mission
+  action: restricted_command
+- id: allow-read
+  effect: allow
+  tool: sandbox
+  action: read_file
+- id: allow-write
+  effect: allow
+  tool: sandbox
+  action: write_file
+- id: allow-network
+  effect: allow
+  tool: sandbox
+  action: network_call
+  rate_limit:
+    max_calls: 5
+    window_seconds: 60
+  not_before: 1999999000
+  expires_at: 2000001000
+- id: allow-actuator
+  effect: allow
+  tool: sandbox
+  action: actuator_set
+- id: allow-proxy
+  effect: allow
+  tool: sandbox
+  action: proxy_call
+emergency_stop:
+  state_key: mode
+  equals: safe
+  allow_actions:
+  - mission:observe_telemetry
+  - mission:enter_safe_mode

@@ -1,0 +1,410 @@
+{
+  "architectures": [
+    "no_guardian",
+    "static_acl",
+    "guardian_initial",
+    "guardian_hardened"
+  ],
+  "benchmark": "guardian-agent-runtime-reference-v3",
+  "benchmark_config_sha256": "799d67d10ef50cf213593c0e287d7ea0825140f30e842bfdda17093d32b85a2c",
+  "benign_cases": 11,
+  "build_identifier": "source-sha256:a73d7db1530a027b",
+  "dependency_lock_sha256": "72a8159b887fa4eecb3d469d85171e052cb587087de9d80bce9354d42406b64c",
+  "fixed_attack_cases": 26,
+  "generated_attack_cases_per_seed": 24,
+  "latency": "Host-dependent latency is measured separately with `make latency` and excluded from deterministic reference outputs.",
+  "reference_time": 2000000000,
+  "research_source_sha256": "8afd67d9fb483f0159edbc43c5d73d3dde1e0c2325942fdfd39859dfb0ba6b3e",
+  "runtime_manifest_hash": "1340fb0e7fd55852f0fcc9fa4328c1af7fd670bc56207c378a3332416dc042de",
+  "schema_version": 2,
+  "seeds": [
+    7,
+    17,
+    29,
+    41,
+    53
+  ],
+  "source_package_sha256": "a73d7db1530a027b7968147d13cf3854f684d765cf5b725c5f98c2e525b6841d",
+  "summary": {
+    "guardian_hardened": {
+      "attack_success_by_class": {
+        "compromised": {
+          "ci95_high": 0.0,
+          "ci95_low": 0.0,
+          "mean": 0.0,
+          "n": 5,
+          "std": 0.0
+        },
+        "manipulated": {
+          "ci95_high": 0.0,
+          "ci95_low": 0.0,
+          "mean": 0.0,
+          "n": 5,
+          "std": 0.0
+        }
+      },
+      "attack_success_rate": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "audit_verification_success": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "benign_task_completion_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "capability_overprivilege_rate": {
+        "ci95_high": 0.47261944047456994,
+        "ci95_low": 0.37738055952543004,
+        "mean": 0.425,
+        "n": 5,
+        "std": 0.054326686710022075
+      },
+      "critical_action_success_rate": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "evidence_completeness": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "false_negative_rate": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "false_positive_blocking_rate": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "policy_coverage": {
+        "ci95_high": 0.5751555527939037,
+        "ci95_low": 0.5089024182205891,
+        "mean": 0.5420289855072464,
+        "n": 5,
+        "std": 0.03779247771131969
+      },
+      "tampering_detection_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "unauthorized_action_rate": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      }
+    },
+    "guardian_initial": {
+      "attack_success_by_class": {
+        "compromised": {
+          "ci95_high": 0.291185811548497,
+          "ci95_low": 0.19392057143022645,
+          "mean": 0.24255319148936172,
+          "n": 5,
+          "std": 0.05548257366129914
+        },
+        "manipulated": {
+          "ci95_high": 0.0,
+          "ci95_low": 0.0,
+          "mean": 0.0,
+          "n": 5,
+          "std": 0.0
+        }
+      },
+      "attack_success_rate": {
+        "ci95_high": 0.2737146628555872,
+        "ci95_low": 0.1822853371444129,
+        "mean": 0.22800000000000004,
+        "n": 5,
+        "std": 0.05215361924162119
+      },
+      "audit_verification_success": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "benign_task_completion_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "capability_overprivilege_rate": {
+        "ci95_high": 0.47261944047456994,
+        "ci95_low": 0.37738055952543004,
+        "mean": 0.425,
+        "n": 5,
+        "std": 0.054326686710022075
+      },
+      "critical_action_success_rate": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "evidence_completeness": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "false_negative_rate": {
+        "ci95_high": 0.2737146628555872,
+        "ci95_low": 0.1822853371444129,
+        "mean": 0.22800000000000004,
+        "n": 5,
+        "std": 0.05215361924162119
+      },
+      "false_positive_blocking_rate": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "policy_coverage": {
+        "ci95_high": 0.5751555527939037,
+        "ci95_low": 0.5089024182205891,
+        "mean": 0.5420289855072464,
+        "n": 5,
+        "std": 0.03779247771131969
+      },
+      "tampering_detection_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "unauthorized_action_rate": {
+        "ci95_high": 0.2737146628555872,
+        "ci95_low": 0.1822853371444129,
+        "mean": 0.22800000000000004,
+        "n": 5,
+        "std": 0.05215361924162119
+      }
+    },
+    "no_guardian": {
+      "attack_success_by_class": {
+        "compromised": {
+          "ci95_high": 1.0,
+          "ci95_low": 1.0,
+          "mean": 1.0,
+          "n": 5,
+          "std": 0.0
+        },
+        "manipulated": {
+          "ci95_high": 1.0,
+          "ci95_low": 1.0,
+          "mean": 1.0,
+          "n": 5,
+          "std": 0.0
+        }
+      },
+      "attack_success_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "audit_verification_success": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "benign_task_completion_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "capability_overprivilege_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "critical_action_success_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "evidence_completeness": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "false_negative_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "false_positive_blocking_rate": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "policy_coverage": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "tampering_detection_rate": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "unauthorized_action_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      }
+    },
+    "static_acl": {
+      "attack_success_by_class": {
+        "compromised": {
+          "ci95_high": 0.9361702127659575,
+          "ci95_low": 0.9361702127659575,
+          "mean": 0.9361702127659575,
+          "n": 5,
+          "std": 0.0
+        },
+        "manipulated": {
+          "ci95_high": 1.0,
+          "ci95_low": 1.0,
+          "mean": 1.0,
+          "n": 5,
+          "std": 0.0
+        }
+      },
+      "attack_success_rate": {
+        "ci95_high": 0.9399999999999998,
+        "ci95_low": 0.9399999999999998,
+        "mean": 0.9399999999999998,
+        "n": 5,
+        "std": 0.0
+      },
+      "audit_verification_success": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "benign_task_completion_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "capability_overprivilege_rate": {
+        "ci95_high": 1.0,
+        "ci95_low": 1.0,
+        "mean": 1.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "critical_action_success_rate": {
+        "ci95_high": 0.8911965066639491,
+        "ci95_low": 0.843539541601511,
+        "mean": 0.8673680241327301,
+        "n": 5,
+        "std": 0.027184748336975484
+      },
+      "evidence_completeness": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "false_negative_rate": {
+        "ci95_high": 0.9399999999999998,
+        "ci95_low": 0.9399999999999998,
+        "mean": 0.9399999999999998,
+        "n": 5,
+        "std": 0.0
+      },
+      "false_positive_blocking_rate": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "policy_coverage": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "tampering_detection_rate": {
+        "ci95_high": 0.0,
+        "ci95_low": 0.0,
+        "mean": 0.0,
+        "n": 5,
+        "std": 0.0
+      },
+      "unauthorized_action_rate": {
+        "ci95_high": 0.9399999999999998,
+        "ci95_low": 0.9399999999999998,
+        "mean": 0.9399999999999998,
+        "n": 5,
+        "std": 0.0
+      }
+    }
+  }
+}

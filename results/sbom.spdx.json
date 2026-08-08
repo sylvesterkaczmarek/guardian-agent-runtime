@@ -1,0 +1,526 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "creationInfo": {
+    "created": "2026-08-08T00:00:00Z",
+    "creators": [
+      "Person: Sylvester Kaczmarek"
+    ]
+  },
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/sbom/0.3.0/reference-v3",
+  "name": "guardian-agent-runtime-reference-sbom",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-guardian-agent-runtime",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "name": "guardian-agent-runtime",
+      "primaryPackagePurpose": "APPLICATION",
+      "versionInfo": "0.3.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-setuptools",
+      "comment": "Reference environment scope: build-direct",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "setuptools",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "82.0.1"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-wheel",
+      "comment": "Reference environment scope: build-direct",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "wheel",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "0.46.3"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-cryptography",
+      "comment": "Reference environment scope: runtime-direct",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "cryptography",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "46.0.4"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-cffi",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "cffi",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "2.0.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pycparser",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "pycparser",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "3.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-PyYAML",
+      "comment": "Reference environment scope: runtime-direct",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "PyYAML",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "6.0.3"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-numpy",
+      "comment": "Reference environment scope: runtime-direct",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "numpy",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "2.3.5"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-matplotlib",
+      "comment": "Reference environment scope: runtime-direct",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "matplotlib",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "3.10.8"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-contourpy",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "contourpy",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "1.3.3"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-cycler",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "cycler",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "0.12.1"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-fonttools",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "fonttools",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "4.63.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-kiwisolver",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "kiwisolver",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "1.5.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-packaging",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "packaging",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "25.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pillow",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "pillow",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "12.3.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pyparsing",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "pyparsing",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "3.3.2"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-python-dateutil",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "python-dateutil",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "2.9.0.post0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-six",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "six",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "1.17.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-hypothesis",
+      "comment": "Reference environment scope: development-direct",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "hypothesis",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "6.138.13"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-attrs",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "attrs",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "26.1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-sortedcontainers",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "sortedcontainers",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "2.4.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-mypy",
+      "comment": "Reference environment scope: development-direct",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "mypy",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "1.17.1"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-mypy-extensions",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "mypy_extensions",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "1.1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pathspec",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "pathspec",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "1.1.1"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-typing-extensions",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "typing_extensions",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "4.16.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pytest",
+      "comment": "Reference environment scope: development-direct",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "pytest",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "8.4.1"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-iniconfig",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "iniconfig",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "2.3.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pluggy",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "pluggy",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "1.6.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Pygments",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "Pygments",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "2.20.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pytest-cov",
+      "comment": "Reference environment scope: development-direct",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "pytest-cov",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "6.2.1"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-coverage",
+      "comment": "Reference environment scope: transitive",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "coverage",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "7.13.3"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-ruff",
+      "comment": "Reference environment scope: development-direct",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "name": "ruff",
+      "primaryPackagePurpose": "LIBRARY",
+      "versionInfo": "0.12.9"
+    }
+  ],
+  "relationships": [
+    {
+      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relationshipType": "BUILD_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Package-setuptools"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relationshipType": "BUILD_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Package-wheel"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-cryptography",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-guardian-agent-runtime"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-PyYAML",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-guardian-agent-runtime"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-numpy",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-guardian-agent-runtime"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-matplotlib",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-guardian-agent-runtime"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relationshipType": "DEV_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Package-hypothesis"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relationshipType": "DEV_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Package-mypy"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relationshipType": "DEV_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Package-pytest"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relationshipType": "DEV_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Package-pytest-cov"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relationshipType": "DEV_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Package-ruff"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-cffi",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-cryptography"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-pycparser",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-cffi"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-contourpy",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-matplotlib"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-cycler",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-matplotlib"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-fonttools",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-matplotlib"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-kiwisolver",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-matplotlib"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-numpy",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-matplotlib"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-packaging",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-matplotlib"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-pillow",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-matplotlib"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-pyparsing",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-matplotlib"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-python-dateutil",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-matplotlib"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-numpy",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-contourpy"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-six",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-python-dateutil"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-attrs",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-hypothesis"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-sortedcontainers",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-hypothesis"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-mypy-extensions",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-mypy"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-pathspec",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-mypy"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-typing-extensions",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-mypy"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-iniconfig",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-pytest"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-packaging",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-pytest"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-pluggy",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-pytest"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-Pygments",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-pytest"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-coverage",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-pytest-cov"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-pytest",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-pytest-cov"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-pluggy",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-pytest-cov"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-packaging",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-wheel"
+    }
+  ],
+  "spdxVersion": "SPDX-2.3"
+}
