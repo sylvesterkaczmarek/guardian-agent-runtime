@@ -9,7 +9,7 @@
   "benchmark_config_sha256": "799d67d10ef50cf213593c0e287d7ea0825140f30e842bfdda17093d32b85a2c",
   "benign_cases": 11,
   "build_identifier": "source-sha256:f518e6f55a7a2fee",
-  "dependency_lock_sha256": "72a8159b887fa4eecb3d469d85171e052cb587087de9d80bce9354d42406b64c",
+  "dependency_lock_sha256": "a4d07ebbb78dfec4563c9a836357f23db5352308c7a734569e64dc8c13e856e5",
   "fixed_attack_cases": 26,
   "generated_attack_cases_per_seed": 24,
   "latency": "Host-dependent latency is measured separately with `make latency` and excluded from deterministic reference outputs.",
