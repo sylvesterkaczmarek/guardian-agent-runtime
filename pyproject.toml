@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=75", "wheel"]
+requires = ["setuptools>=83", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,7 +11,7 @@ requires-python = ">=3.12"
 license = {text = "MIT"}
 authors = [{name = "Sylvester Kaczmarek"}]
 dependencies = [
-  "cryptography>=46,<47",
+  "cryptography>=50,<51",
   "PyYAML>=6,<7",
   "numpy>=2,<3",
   "matplotlib>=3.10,<4",
@@ -21,7 +21,7 @@ dependencies = [
 dev = [
   "hypothesis>=6.130,<7",
   "mypy>=1.15,<2",
-  "pytest>=8.3,<9",
+  "pytest>=9.0.3,<10",
   "pytest-cov>=6,<7",
   "ruff>=0.11,<1",
 ]
@@ -43,7 +43,10 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "UP", "B"]
-ignore = ["E501"]
+ignore = ["E501", "UP037", "UP038"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/properties/test_hypothesis_properties.py" = ["E402"]
 
 [tool.mypy]
 python_version = "3.12"
