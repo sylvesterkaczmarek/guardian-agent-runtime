@@ -48,7 +48,7 @@ jobs:
             --output /tmp/tla2tools.jar
           echo "bee4a54f3ee3d4afc347c3240ec2d9e93b075104  /tmp/tla2tools.jar" | sha1sum --check --strict
           java -XX:+UseParallelGC -cp /tmp/tla2tools.jar tlc2.TLC \
-            -workers 1 -config formal/guardian.cfg formal/guardian.tla
+            -deadlock -workers 1 -config formal/guardian.cfg formal/guardian.tla
       - run: python -m experiments.attack_suite
       - if: matrix.python-version == '3.12'
         run: |
