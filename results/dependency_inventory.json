@@ -187,12 +187,12 @@
     }
   ],
   "lock_file": "requirements.lock",
-  "lock_sha256": "72a8159b887fa4eecb3d469d85171e052cb587087de9d80bce9354d42406b64c",
+  "lock_sha256": "a4d07ebbb78dfec4563c9a836357f23db5352308c7a734569e64dc8c13e856e5",
   "packages": [
     {
       "name": "setuptools",
       "scope": "build-direct",
-      "version": "82.0.1"
+      "version": "83.0.0"
     },
     {
       "name": "wheel",
@@ -202,7 +202,7 @@
     {
       "name": "cryptography",
       "scope": "runtime-direct",
-      "version": "46.0.4"
+      "version": "50.0.0"
     },
     {
       "name": "cffi",
@@ -312,7 +312,7 @@
     {
       "name": "pytest",
       "scope": "development-direct",
-      "version": "8.4.1"
+      "version": "9.0.3"
     },
     {
       "name": "iniconfig",
