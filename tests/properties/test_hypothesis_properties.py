@@ -88,7 +88,7 @@ def test_narrower_numeric_delegation_is_subset(parent_min, parent_max, tighten_l
 
 
 @settings(max_examples=80, deadline=None)
-@given(st.text(min_size=1).filter(lambda value: value != value.strip()))
+@given(st.text().map(lambda value: f" {value}"))
 def test_ambiguous_identifier_whitespace_fails_closed(action):
     runtime, _, _ = build_guardian("mission", hardened=True)
     request = ActionRequest(

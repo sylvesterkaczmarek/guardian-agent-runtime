@@ -27,7 +27,7 @@
       "licenseConcluded": "NOASSERTION",
       "name": "setuptools",
       "primaryPackagePurpose": "LIBRARY",
-      "versionInfo": "82.0.1"
+      "versionInfo": "83.0.0"
     },
     {
       "SPDXID": "SPDXRef-Package-wheel",
@@ -47,7 +47,7 @@
       "licenseConcluded": "NOASSERTION",
       "name": "cryptography",
       "primaryPackagePurpose": "LIBRARY",
-      "versionInfo": "46.0.4"
+      "versionInfo": "50.0.0"
     },
     {
       "SPDXID": "SPDXRef-Package-cffi",
@@ -267,7 +267,7 @@
       "licenseConcluded": "NOASSERTION",
       "name": "pytest",
       "primaryPackagePurpose": "LIBRARY",
-      "versionInfo": "8.4.1"
+      "versionInfo": "9.0.3"
     },
     {
       "SPDXID": "SPDXRef-Package-iniconfig",
