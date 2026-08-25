@@ -27,7 +27,6 @@ jobs:
         with:
           inputs: requirements.lock
           no-deps: true
-          disable-pip: true
 
   test:
     runs-on: ubuntu-latest
