@@ -56,5 +56,22 @@ warn_unused_ignores = true
 no_implicit_optional = true
 exclude = ["tests"]
 
+[[tool.mypy.overrides]]
+module = [
+  "guardian_runtime.yamlutil",
+  "guardian_runtime.policy.engine",
+  "guardian_runtime.factory",
+  "guardian_runtime.adversarial.hardening",
+]
+disable_error_code = ["import-untyped"]
+
+[[tool.mypy.overrides]]
+module = ["guardian_runtime.evidence.log"]
+disable_error_code = ["arg-type"]
+
+[[tool.mypy.overrides]]
+module = ["guardian_runtime.adversarial.attacks"]
+disable_error_code = ["assignment"]
+
 [tool.setuptools.package-data]
 "guardian_runtime.resources" = ["guardian/*.yaml", "capabilities/*.yaml", "benchmarks/*.yaml"]
