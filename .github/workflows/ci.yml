@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12", "3.13"]
+        python-version: ["3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -55,12 +55,16 @@ jobs:
           python -m experiments.run_reference_suite
           git diff --exit-code -- results
       - if: matrix.python-version == '3.12'
+        name: Installed-wheel and CLI smoke test
         run: |
           python -m pip wheel . --no-deps --no-build-isolation -w dist
-          mkdir -p /tmp/guardian-wheel-test
-          python -m pip install --no-deps --target /tmp/guardian-wheel-test dist/*.whl
+          python -m venv --system-site-packages /tmp/guardian-wheel-venv
+          /tmp/guardian-wheel-venv/bin/python -m pip install --no-deps dist/*.whl
           cd /tmp
-          PYTHONPATH=/tmp/guardian-wheel-test python - <<'PY'
+          /tmp/guardian-wheel-venv/bin/python -m pip check
+          /tmp/guardian-wheel-venv/bin/guardian-verify --help >/dev/null
+          /tmp/guardian-wheel-venv/bin/guardian-verify-manifest --help >/dev/null
+          /tmp/guardian-wheel-venv/bin/python - <<'PY'
           from guardian_runtime.factory import build_guardian
           from guardian_runtime.types import ActionRequest
 
