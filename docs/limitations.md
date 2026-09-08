@@ -12,7 +12,7 @@ Calls through a runtime and its gateway share a reentrant execution lock. This s
 
 Resource-budget accounting stores exact `Fraction` totals in `PolicyRuntimeState.resource_usage`. Integrations that export that internal state must explicitly convert those values, preferably to numerator/denominator pairs when exact restoration matters. Normal requests, permits and evidence retain their JSON representation.
 
-Request parameters and context are limited to 64 nesting levels; generic canonical JSON permits 128 to accommodate signed envelopes. Deeper input is rejected before authority is reserved. Diagnostic evidence marks cycles and excessive nesting explicitly. Expired pending request copies are discarded on the next authorization, but consumed nonce, invocation and policy reservations are retained.
+Request parameters and context are limited to 64 nesting levels; generic canonical JSON and verifier JSON input permit 128 to accommodate signed envelopes. These limits are explicit across supported Python versions. Deeper requests are rejected before authority is reserved. Diagnostic evidence marks cycles and excessive nesting explicitly. Expired pending request copies are discarded on the next authorization, but consumed nonce, invocation and policy reservations are retained.
 
 The bounded formal models assume atomic execution and evidence append. Their checked invariants apply to those models; they do not establish equivalence to the Python code, durable audit storage or crash-safe execution.
 
