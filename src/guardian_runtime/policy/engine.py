@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import fnmatch
+import math
 from dataclasses import dataclass, field
+from fractions import Fraction
 from pathlib import Path
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, TypeGuard
 
 import yaml
 
-from guardian_runtime.canonical import CanonicalizationError, canonicalize_resource
+from guardian_runtime.canonical import CanonicalizationError, canonicalize_resource, normalize_json
 from guardian_runtime.types import ActionRequest, RuntimeState
 from guardian_runtime.yamlutil import load_yaml_unique
 
@@ -69,7 +71,7 @@ class Policy:
 class PolicyRuntimeState:
     rule_hits: dict[str, list[int]] = field(default_factory=dict)
     authorization_history: list[tuple[int, str, str, str]] = field(default_factory=list)
-    resource_usage: dict[str, float] = field(default_factory=dict)
+    resource_usage: dict[str, Fraction | float] = field(default_factory=dict)
 
     def clone(self) -> "PolicyRuntimeState":
         return PolicyRuntimeState(
@@ -113,6 +115,10 @@ _ALLOWED_CONSTRAINT_KEYS = {
 
 
 def _validate_constraint(name: str, constraint: Any) -> None:
+    try:
+        normalize_json(constraint)
+    except CanonicalizationError as exc:
+        raise PolicyError(f"invalid constraint for {name}: {exc}") from exc
     if not isinstance(constraint, dict):
         return
     unknown = set(constraint) - _ALLOWED_CONSTRAINT_KEYS
@@ -139,6 +145,8 @@ def _validate_constraint(name: str, constraint: Any) -> None:
 
 
 def _matches_constraint(value: Any, constraint: Any) -> bool:
+    if isinstance(value, float) and not math.isfinite(value):
+        return False
     if not isinstance(constraint, dict):
         return value == constraint
     if "eq" in constraint and value != constraint["eq"]:
@@ -183,6 +191,66 @@ def _action_key(request: ActionRequest) -> str:
     return f"{request.tool}:{request.action}"
 
 
+def _finite_number(value: Any) -> TypeGuard[int | float]:
+    return (
+        isinstance(value, int) and not isinstance(value, bool)
+        or isinstance(value, float) and math.isfinite(value)
+    )
+
+
+def _budget_amount(value: Fraction | float) -> Fraction:
+    """Account for supplied decimal values without rounding away later costs."""
+
+    if isinstance(value, Fraction):
+        return value
+    if not _finite_number(value):
+        raise PolicyError("resource budget values must be finite numbers")
+    if isinstance(value, int):
+        return Fraction(value)
+    return Fraction(str(value))
+
+
+def _validate_rule(rule: PolicyRule) -> None:
+    if not isinstance(rule.rule_id, str) or not rule.rule_id:
+        raise PolicyError("rule id must be a non-empty string")
+    if rule.effect not in {"allow", "deny", "escalate"}:
+        raise PolicyError("rule effect must be allow, deny, or escalate")
+    for name in ("subject", "session", "tool", "action", "resource"):
+        if not isinstance(getattr(rule, name), str):
+            raise PolicyError(f"{name} must be a string in rule {rule.rule_id}")
+    for constraints in (rule.param_constraints, rule.state_constraints):
+        if not isinstance(constraints, Mapping):
+            raise PolicyError(f"params and state must be mappings in rule {rule.rule_id}")
+        for name, constraint in constraints.items():
+            if not isinstance(name, str) or not name:
+                raise PolicyError(f"constraint names must be non-empty strings in rule {rule.rule_id}")
+            _validate_constraint(name, constraint)
+    for name in ("purpose", "forbidden_after", "separation_of_duty_after"):
+        values = getattr(rule, name)
+        if not isinstance(values, (list, tuple)) or not all(isinstance(item, str) and item for item in values):
+            raise PolicyError(f"{name} must be a sequence of non-empty strings in rule {rule.rule_id}")
+    for name in ("not_before", "expires_at"):
+        value = getattr(rule, name)
+        if value is not None and (not isinstance(value, int) or isinstance(value, bool)):
+            raise PolicyError(f"{name} must be an integer in rule {rule.rule_id}")
+    if rule.not_before is not None and rule.expires_at is not None and rule.expires_at <= rule.not_before:
+        raise PolicyError(f"invalid temporal interval in rule {rule.rule_id}")
+    if rule.rate_limit is not None:
+        if not isinstance(rule.rate_limit, RateLimit) or any(
+            not isinstance(value, int) or isinstance(value, bool) or value <= 0
+            for value in (rule.rate_limit.max_calls, rule.rate_limit.window_seconds)
+        ):
+            raise PolicyError(f"invalid rate_limit values in rule {rule.rule_id}")
+    if rule.resource_budget is not None:
+        budget = rule.resource_budget
+        if not isinstance(budget, ResourceBudget):
+            raise PolicyError(f"invalid resource_budget in rule {rule.rule_id}")
+        if not all(isinstance(value, str) and value for value in (budget.key, budget.cost_param)):
+            raise PolicyError(f"invalid resource_budget identifiers in rule {rule.rule_id}")
+        if not _finite_number(budget.max_total) or budget.max_total < 0:
+            raise PolicyError(f"invalid resource_budget limit in rule {rule.rule_id}")
+
+
 def _rule_matches(rule: PolicyRule, request: ActionRequest, state: RuntimeState, now: int) -> bool:
     if not fnmatch.fnmatchcase(request.subject, rule.subject):
         return False
@@ -219,10 +287,24 @@ def _rule_matches(rule: PolicyRule, request: ActionRequest, state: RuntimeState,
 
 class PolicyEngine:
     def __init__(self, policy: Policy) -> None:
+        if not isinstance(policy.version, str) or not policy.version:
+            raise PolicyError("policy requires a string version")
         if policy.default not in {"allow", "deny"}:
             raise PolicyError("policy default must be allow or deny")
-        if any(rule.effect not in {"allow", "deny", "escalate"} for rule in policy.rules):
-            raise PolicyError("rule effect must be allow, deny, or escalate")
+        for rule in policy.rules:
+            _validate_rule(rule)
+        if policy.emergency_stop is not None:
+            emergency = policy.emergency_stop
+            if not isinstance(emergency.state_key, str) or not emergency.state_key:
+                raise PolicyError("emergency_stop requires state_key")
+            if not isinstance(emergency.allow_actions, (list, tuple)) or not all(
+                isinstance(item, str) and item for item in emergency.allow_actions
+            ):
+                raise PolicyError("emergency_stop allow_actions must be a sequence of action keys")
+            try:
+                normalize_json(emergency.equals)
+            except CanonicalizationError as exc:
+                raise PolicyError(f"invalid emergency_stop equals value: {exc}") from exc
         ids = [rule.rule_id for rule in policy.rules]
         if len(ids) != len(set(ids)):
             raise PolicyError("policy rule ids must be unique")
@@ -240,6 +322,8 @@ class PolicyEngine:
         now: int = 0,
         runtime: PolicyRuntimeState | None = None,
     ) -> tuple[bool, str, str | None]:
+        if not isinstance(now, int) or isinstance(now, bool) or now < 0:
+            return False, "policy time must be a non-negative integer", None
         runtime = runtime or PolicyRuntimeState()
         emergency = self.policy.emergency_stop
         if emergency is not None and state.values.get(emergency.state_key) == emergency.equals:
@@ -270,10 +354,14 @@ class PolicyEngine:
                     return False, f"separation of duty required by policy rule {rule.rule_id}", rule.rule_id
             if rule.resource_budget is not None:
                 raw_cost = request.params.get(rule.resource_budget.cost_param)
-                if not isinstance(raw_cost, (int, float)) or isinstance(raw_cost, bool) or raw_cost < 0:
+                if not _finite_number(raw_cost) or raw_cost < 0:
                     return False, f"invalid resource budget cost for policy rule {rule.rule_id}", rule.rule_id
                 current = runtime.resource_usage.get(rule.resource_budget.key, 0.0)
-                if current + float(raw_cost) > rule.resource_budget.max_total:
+                try:
+                    total = _budget_amount(current) + _budget_amount(raw_cost)
+                except PolicyError:
+                    return False, f"invalid resource budget state for policy rule {rule.rule_id}", rule.rule_id
+                if total > _budget_amount(rule.resource_budget.max_total):
                     return False, f"resource budget exceeded for policy rule {rule.rule_id}", rule.rule_id
             return True, f"allowed by policy rule {rule.rule_id}", rule.rule_id
 
@@ -288,22 +376,34 @@ class PolicyEngine:
         now: int,
         runtime: PolicyRuntimeState,
     ) -> None:
+        if not isinstance(now, int) or isinstance(now, bool) or now < 0:
+            raise PolicyError("policy time must be a non-negative integer")
         if rule_id is None:
             runtime.authorization_history.append((now, _action_key(request), request.subject, "default"))
             return
         rule = next((candidate for candidate in self.policy.rules if candidate.rule_id == rule_id), None)
         if rule is None or rule.effect != "allow":
             return
+        budget_total = None
+        if rule.resource_budget is not None:
+            raw_cost = request.params.get(rule.resource_budget.cost_param)
+            if not _finite_number(raw_cost) or raw_cost < 0:
+                raise PolicyError(f"invalid resource budget cost for policy rule {rule.rule_id}")
+            current = runtime.resource_usage.get(rule.resource_budget.key, 0.0)
+            budget_total = _budget_amount(current) + _budget_amount(raw_cost)
         runtime.rule_hits.setdefault(rule_id, []).append(now)
         runtime.authorization_history.append((now, _action_key(request), request.subject, rule_id))
-        if rule.resource_budget is not None:
-            raw_cost = request.params.get(rule.resource_budget.cost_param, 0)
-            runtime.resource_usage[rule.resource_budget.key] = runtime.resource_usage.get(rule.resource_budget.key, 0.0) + float(raw_cost)
+        if rule.resource_budget is not None and budget_total is not None:
+            runtime.resource_usage[rule.resource_budget.key] = budget_total
 
     @classmethod
     def from_file(cls, path: str | Path) -> "PolicyEngine":
+        return cls.from_text(Path(path).read_text(encoding="utf-8"))
+
+    @classmethod
+    def from_text(cls, text: str) -> "PolicyEngine":
         try:
-            data = load_yaml_unique(Path(path).read_text(encoding="utf-8"))
+            data = load_yaml_unique(text)
         except yaml.YAMLError as exc:
             raise PolicyError(f"invalid or ambiguous policy YAML: {exc}") from exc
         if not isinstance(data, dict):
@@ -395,7 +495,7 @@ class PolicyEngine:
                     or value["max_total"] < 0
                 ):
                     raise PolicyError(f"invalid resource_budget limit in rule {raw['id']}")
-                budget = ResourceBudget(value["key"], value["cost_param"], float(value["max_total"]))
+                budget = ResourceBudget(value["key"], value["cost_param"], value["max_total"])
 
             raw_forbidden = raw.get("forbidden_after", ())
             raw_separation = raw.get("separation_of_duty_after", ())

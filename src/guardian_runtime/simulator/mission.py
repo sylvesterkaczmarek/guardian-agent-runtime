@@ -2,9 +2,18 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any
+import math
+from typing import Any, TypeGuard
 
 from guardian_runtime.types import ActionRequest, RuntimeState, ToolResult
+
+
+def _finite_number(value: Any) -> TypeGuard[int | float]:
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and (not isinstance(value, float) or math.isfinite(value))
+    )
 
 
 @dataclass
@@ -53,9 +62,9 @@ class MissionEnvironment:
         p = request.params
         if action == "maneuver":
             delta_v = p.get("delta_v")
-            if not isinstance(delta_v, (int, float)) or isinstance(delta_v, bool):
+            if not _finite_number(delta_v):
                 return False, "maneuver delta_v must be numeric"
-            if abs(float(delta_v)) > 5.0:
+            if abs(delta_v) > 5:
                 return False, "maneuver exceeds hard delta-v envelope"
             if self.state.mode == "safe":
                 return False, "maneuver prohibited in safe mode"
@@ -63,13 +72,13 @@ class MissionEnvironment:
                 return False, "maneuver prohibited during communications loss"
         elif action == "point_payload":
             angle = p.get("angle_deg")
-            if not isinstance(angle, (int, float)) or abs(float(angle)) > 30.0:
+            if not _finite_number(angle) or abs(angle) > 30:
                 return False, "payload pointing exceeds hard envelope"
             if self.state.mode == "safe":
                 return False, "payload pointing prohibited in safe mode"
         elif action == "change_power":
             allocation = p.get("allocation")
-            if not isinstance(allocation, (int, float)) or not 0 <= float(allocation) <= 90:
+            if not _finite_number(allocation) or not 0 <= allocation <= 90:
                 return False, "power allocation outside hard envelope"
             if self.state.thermal_c >= 80 and float(allocation) > self.state.power_allocated:
                 return False, "thermal state prohibits increasing power"
@@ -94,7 +103,7 @@ class MissionEnvironment:
             nested_params = p.get("activity_params", {})
             if nested == "maneuver":
                 dv = nested_params.get("delta_v") if isinstance(nested_params, dict) else None
-                if not isinstance(dv, (int, float)) or abs(float(dv)) > 5.0:
+                if not _finite_number(dv) or abs(dv) > 5:
                     return False, "scheduled maneuver exceeds hard delta-v envelope"
             if nested == "modify_software":
                 return False, "software modification cannot be scheduled through generic activity"

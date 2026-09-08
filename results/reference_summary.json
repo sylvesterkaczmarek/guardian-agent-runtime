@@ -8,14 +8,14 @@
   "benchmark": "guardian-agent-runtime-reference-v3",
   "benchmark_config_sha256": "799d67d10ef50cf213593c0e287d7ea0825140f30e842bfdda17093d32b85a2c",
   "benign_cases": 11,
-  "build_identifier": "source-sha256:f518e6f55a7a2fee",
+  "build_identifier": "source-sha256:7e27d4df782fbb90",
   "dependency_lock_sha256": "a4d07ebbb78dfec4563c9a836357f23db5352308c7a734569e64dc8c13e856e5",
   "fixed_attack_cases": 26,
   "generated_attack_cases_per_seed": 24,
   "latency": "Host-dependent latency is measured separately with `make latency` and excluded from deterministic reference outputs.",
   "reference_time": 2000000000,
-  "research_source_sha256": "5ecf70f9c9cd2fe8b3610baf9dea1b5b6328f3bbccf6c1307c0a606e23236871",
-  "runtime_manifest_hash": "a1018fb59e652c06567d2fad9be15c29e04d4d6304b6580f3d9cf2ecc8b32f27",
+  "research_source_sha256": "0916d8b36b9b82c2dd0e735add1463ad4685b70050cd2b4f8900d32d85662b47",
+  "runtime_manifest_hash": "1d7e3dfaba87dab05444fce984c25f0f2312ab758e3ae802d542866b5204fc02",
   "schema_version": 2,
   "seeds": [
     7,
@@ -24,7 +24,7 @@
     41,
     53
   ],
-  "source_package_sha256": "f518e6f55a7a2fee08cb5297869aaffeea18dc3980e8d55e6eec08a25c2d0819",
+  "source_package_sha256": "7e27d4df782fbb90be3d0b7da2f1e5d18b9b7d41a6b68c453ddf17c14c20a08c",
   "summary": {
     "guardian_hardened": {
       "attack_success_by_class": {
@@ -65,11 +65,11 @@
         "std": 0.0
       },
       "capability_overprivilege_rate": {
-        "ci95_high": 0.47261944047456994,
-        "ci95_low": 0.37738055952543004,
-        "mean": 0.425,
+        "ci95_high": 0.3972793605423657,
+        "ci95_low": 0.28843492517192004,
+        "mean": 0.34285714285714286,
         "n": 5,
-        "std": 0.054326686710022075
+        "std": 0.06208764195431093
       },
       "critical_action_success_rate": {
         "ci95_high": 0.0,
@@ -100,11 +100,11 @@
         "std": 0.0
       },
       "policy_coverage": {
-        "ci95_high": 0.5751555527939037,
-        "ci95_low": 0.5089024182205891,
-        "mean": 0.5420289855072464,
+        "ci95_high": 0.5896483064170921,
+        "ci95_low": 0.5233951718437775,
+        "mean": 0.5565217391304348,
         "n": 5,
-        "std": 0.03779247771131969
+        "std": 0.037792477711319696
       },
       "tampering_detection_rate": {
         "ci95_high": 1.0,
@@ -160,11 +160,11 @@
         "std": 0.0
       },
       "capability_overprivilege_rate": {
-        "ci95_high": 0.47261944047456994,
-        "ci95_low": 0.37738055952543004,
-        "mean": 0.425,
+        "ci95_high": 0.3972793605423657,
+        "ci95_low": 0.28843492517192004,
+        "mean": 0.34285714285714286,
         "n": 5,
-        "std": 0.054326686710022075
+        "std": 0.06208764195431093
       },
       "critical_action_success_rate": {
         "ci95_high": 0.0,
@@ -195,11 +195,11 @@
         "std": 0.0
       },
       "policy_coverage": {
-        "ci95_high": 0.5751555527939037,
-        "ci95_low": 0.5089024182205891,
-        "mean": 0.5420289855072464,
+        "ci95_high": 0.5896483064170921,
+        "ci95_low": 0.5233951718437775,
+        "mean": 0.5565217391304348,
         "n": 5,
-        "std": 0.03779247771131969
+        "std": 0.037792477711319696
       },
       "tampering_detection_rate": {
         "ci95_high": 1.0,

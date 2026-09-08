@@ -8,6 +8,14 @@ Replay caches, consumed nonces, revocation state, invocation budgets, policy rat
 
 Authorization is intentionally reservation-based. Once a valid request passes capability, policy, and invariant checks, its nonce and invocation authority are consumed and its policy rate/resource budget is recorded before tool execution. A caller that obtains valid permits and never executes them can therefore reduce availability. Reclaiming abandoned reservations safely would require a durable transaction or lease protocol that this reference implementation does not provide.
 
+Calls through a runtime and its gateway share a reentrant execution lock. This serialises mediated tool execution and prevents concurrent permit reuse within that runtime, at the cost of parallel throughput for slow tools. It does not protect direct simulator-state changes, shared external devices or other processes. Custom tools remain part of the trusted computing base. Failed or interrupted tools can have partial side effects, so their permits are consumed and the attempt is recorded rather than retried automatically.
+
+Resource-budget accounting stores exact `Fraction` totals in `PolicyRuntimeState.resource_usage`. Integrations that export that internal state must explicitly convert those values, preferably to numerator/denominator pairs when exact restoration matters. Normal requests, permits and evidence retain their JSON representation.
+
+Request parameters and context are limited to 64 nesting levels; generic canonical JSON and verifier JSON input permit 128 to accommodate signed envelopes. These limits are explicit across supported Python versions. Deeper requests are rejected before authority is reserved. Diagnostic evidence marks cycles and excessive nesting explicitly. Expired pending request copies are discarded on the next authorization, but consumed nonce, invocation and policy reservations are retained.
+
+The bounded formal models assume atomic execution and evidence append. Their checked invariants apply to those models; they do not establish equivalence to the Python code, durable audit storage or crash-safe execution.
+
 The reference dependency lock fixes package versions and installs with resolution disabled, but it does not include distribution-artifact hashes. The repository therefore does not claim cryptographic provenance for every third-party wheel or source archive. CI action dependencies are separately pinned to full commit SHAs.
 
 The hardened Guardian blocks the included fixed and seeded attack distribution. This does not establish completeness against unknown attack classes.

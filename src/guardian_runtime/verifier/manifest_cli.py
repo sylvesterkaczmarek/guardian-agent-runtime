@@ -7,6 +7,7 @@ from pathlib import Path
 from guardian_runtime.crypto import load_public_key_b64
 from guardian_runtime.manifest import SignedManifest, verify_manifest
 from guardian_runtime.jsonutil import loads_unique
+from guardian_runtime.verifier._output import print_result
 
 
 def main() -> int:
@@ -22,29 +23,32 @@ def main() -> int:
     try:
         payload = loads_unique(args.manifest.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
-        print(f"invalid manifest file: {exc}")
+        print_result(f"invalid manifest file: {exc}")
         return 2
     if not isinstance(payload, Mapping):
-        print("invalid manifest file: expected a JSON object")
+        print_result("invalid manifest file: expected a JSON object")
         return 2
     try:
         signed = SignedManifest(
             manifest=payload["manifest"],
-            manifest_hash=str(payload["manifest_hash"]),
-            signature=str(payload["signature"]),
+            manifest_hash=payload["manifest_hash"],
+            signature=payload["signature"],
         )
         public_key = load_public_key_b64(args.public_key)
     except (KeyError, TypeError, ValueError) as exc:
-        print(f"invalid manifest input: {exc}")
+        print_result(f"invalid manifest input: {exc}")
+        return 2
+    if not isinstance(signed.manifest_hash, str) or not isinstance(signed.signature, str):
+        print_result("invalid manifest input: manifest_hash and signature must be strings")
         return 2
     if not isinstance(signed.manifest, Mapping):
-        print("invalid manifest input: manifest must be an object")
+        print_result("invalid manifest input: manifest must be an object")
         return 2
 
     if verify_manifest(signed, public_key):
-        print("runtime manifest valid")
+        print_result("runtime manifest valid")
         return 0
-    print("runtime manifest verification failed")
+    print_result("runtime manifest verification failed")
     return 1
 
 

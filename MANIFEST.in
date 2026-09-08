@@ -1,0 +1,12 @@
+include LICENSE README.md CITATION.cff SECURITY.md Makefile Dockerfile
+include requirements.txt requirements-dev.txt requirements.lock
+recursive-include docs *.md
+recursive-include configs *.yaml
+recursive-include tests *.py
+recursive-include experiments *.py
+recursive-include scripts *.py
+recursive-include formal *.py *.tla *.cfg
+recursive-include results *.json *.sha256 *.png
+prune results/local
+recursive-include assets *.png
+recursive-include .github/workflows *.yml

@@ -138,9 +138,11 @@ def _propose_defense(minimized: list[Scenario]) -> dict[str, Any] | None:
 
 def _benign_completion(architecture: str, *, policy_path: Path | None = None) -> float:
     outcomes = [
-        run_benign_scenario(architecture, case, policy_path=policy_path).allowed_count > 0
+        run_benign_scenario(architecture, case, policy_path=policy_path).task_completed
         for case in benign_scenarios()
     ]
+    if not outcomes:
+        raise ValueError("hardening evaluation requires at least one benign scenario")
     return sum(outcomes) / len(outcomes)
 
 
@@ -180,7 +182,9 @@ def run_self_hardening() -> dict[str, Any]:
     proposal = _propose_defense(minimized)
 
     benign_before = _benign_completion("guardian_initial")
-    hardened_results = []
+    # With no applicable proposal the initial behaviour remains the final result.
+    # This also lets an already-secure policy complete the experiment normally.
+    hardened_results = initial_results
     benign_after = benign_before
     reviewed_policy_matches_candidate = False
 

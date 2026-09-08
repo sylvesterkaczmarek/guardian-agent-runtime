@@ -16,6 +16,8 @@ from guardian_runtime.types import ActionRequest
 
 WARMUP = 20
 ITERATIONS = 200
+Invocation = Callable[[ActionRequest], Any]
+Preparation = Callable[[], None]
 
 
 def _request(index: int) -> ActionRequest:
@@ -47,65 +49,69 @@ def _summary(values: list[float]) -> dict[str, float | int]:
     }
 
 
-def _measure_calls(invoke: Callable[[ActionRequest], Any]) -> dict[str, float | int]:
+def _measure_calls(invoke: Invocation, prepare: Preparation) -> dict[str, float | int]:
     for index in range(WARMUP):
+        prepare()
         invoke(_request(-index - 1))
 
     values: list[float] = []
     for index in range(ITERATIONS):
+        request = _request(index)
+        prepare()
         start = time.perf_counter_ns()
-        invoke(_request(index))
+        invoke(request)
         values.append((time.perf_counter_ns() - start) / 1e6)
     return _summary(values)
 
 
-def _decision_invoker(architecture: str) -> Callable[[ActionRequest], Any]:
+def _decision_invoker(architecture: str) -> tuple[Invocation, Preparation]:
     if architecture == "no_guardian":
-        return lambda request: True
+        return (lambda request: True), (lambda: None)
     if architecture == "static_acl":
         allowed = set(DEFAULT_ACL)
-        return lambda request: (request.tool.strip().lower(), request.action.strip().lower()) in allowed
+        return (lambda request: (request.tool.strip().lower(), request.action.strip().lower()) in allowed), (lambda: None)
+
+    return _guardian_invoker(architecture, end_to_end=False)
+
+
+def _guardian_invoker(architecture: str, *, end_to_end: bool) -> tuple[Invocation, Preparation]:
+    if architecture not in {"guardian_initial", "guardian_hardened"}:
+        raise ValueError(f"unknown architecture: {architecture}")
 
     runtime, _, _ = build_guardian("mission", hardened=architecture == "guardian_hardened")
     calls = 0
 
-    def invoke(request: ActionRequest):
+    def prepare() -> None:
         nonlocal runtime, calls
         if calls >= 90:
             runtime, _, _ = build_guardian("mission", hardened=architecture == "guardian_hardened")
             calls = 0
+
+    def invoke(request: ActionRequest):
+        nonlocal calls
         calls += 1
+        if end_to_end:
+            return runtime.execute_request(request)
         return runtime.evaluate(request)
 
-    return invoke
+    return invoke, prepare
 
 
-def _end_to_end_invoker(architecture: str) -> Callable[[ActionRequest], Any]:
+def _end_to_end_invoker(architecture: str) -> tuple[Invocation, Preparation]:
     if architecture == "no_guardian":
         runner = NoGuardianRunner(MissionEnvironment())
-        return runner.execute
+        return runner.execute, (lambda: None)
     if architecture == "static_acl":
-        runner = StaticACLRunner(MissionEnvironment(), DEFAULT_ACL)
-        return runner.execute
+        acl_runner = StaticACLRunner(MissionEnvironment(), DEFAULT_ACL)
+        return acl_runner.execute, (lambda: None)
 
-    runtime, _, _ = build_guardian("mission", hardened=architecture == "guardian_hardened")
-    calls = 0
-
-    def invoke(request: ActionRequest):
-        nonlocal runtime, calls
-        if calls >= 90:
-            runtime, _, _ = build_guardian("mission", hardened=architecture == "guardian_hardened")
-            calls = 0
-        calls += 1
-        return runtime.execute_request(request)
-
-    return invoke
+    return _guardian_invoker(architecture, end_to_end=True)
 
 
 def measure(architecture: str) -> dict[str, dict[str, float | int]]:
     return {
-        "decision_path": _measure_calls(_decision_invoker(architecture)),
-        "end_to_end_request": _measure_calls(_end_to_end_invoker(architecture)),
+        "decision_path": _measure_calls(*_decision_invoker(architecture)),
+        "end_to_end_request": _measure_calls(*_end_to_end_invoker(architecture)),
     }
 
 
@@ -114,7 +120,8 @@ def main() -> int:
     payload = {
         "note": (
             "Host-dependent measurements; excluded from deterministic reference checksums. "
-            "Decision-path timing measures authorization only."
+            "Decision-path timing measures authorization only. Request construction and "
+            "periodic runtime preparation are excluded from both timed paths."
         ),
         "environment": {
             "python": platform.python_version(),

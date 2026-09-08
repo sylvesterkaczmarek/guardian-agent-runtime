@@ -26,9 +26,10 @@ reproduce:
 	python -m experiments.run_reference_suite
 
 verify-reproduce:
-	cp results/checksums.sha256 /tmp/guardian-checksums.before
-	python -m experiments.run_reference_suite
-	diff -u /tmp/guardian-checksums.before results/checksums.sha256
+	@set -eu; before=$$(mktemp); trap 'rm -f "$$before"' EXIT; \
+	cp results/checksums.sha256 "$$before"; \
+	python -m experiments.run_reference_suite; \
+	diff -u "$$before" results/checksums.sha256
 
 latency:
 	python -m experiments.latency_benchmark

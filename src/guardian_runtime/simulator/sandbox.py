@@ -48,7 +48,7 @@ class SandboxEnvironment:
             return False, "stale observed state"
         if request.action == "actuator_set":
             value = request.params.get("value")
-            if not isinstance(value, int) or not -10 <= value <= 10:
+            if not isinstance(value, int) or isinstance(value, bool) or not -10 <= value <= 10:
                 return False, "actuator command outside hard envelope"
         if request.action == "network_call":
             target = request.params.get("target", "")

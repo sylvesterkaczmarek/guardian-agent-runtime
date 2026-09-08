@@ -3,7 +3,7 @@
     "attestation": "software-signed-manifest-only",
     "benchmark_configuration": "reference-v3",
     "benchmark_configuration_hash": "799d67d10ef50cf213593c0e287d7ea0825140f30e842bfdda17093d32b85a2c",
-    "build_identifier": "source-sha256:f518e6f55a7a2fee",
+    "build_identifier": "source-sha256:7e27d4df782fbb90",
     "configuration_hash": "a5448eedb5222d7b9f31515c4088e5be40e5eee983a9bfcd6d6e72fc9e00421c",
     "guardian_version": "0.3.1",
     "nested_action_mediation": "guardian-recursive",
@@ -12,12 +12,12 @@
     ],
     "policy_hash": "a12ced707f570117db194757e85990de7bb33e1d3d4fab4cba76a229928ecae5",
     "policy_version": "1.2-hardened",
-    "source_package_sha256": "f518e6f55a7a2fee08cb5297869aaffeea18dc3980e8d55e6eec08a25c2d0819",
+    "source_package_sha256": "7e27d4df782fbb90be3d0b7da2f1e5d18b9b7d41a6b68c453ddf17c14c20a08c",
     "tool_versions": {
       "mission": "sim-3"
     }
   },
-  "manifest_hash": "a1018fb59e652c06567d2fad9be15c29e04d4d6304b6580f3d9cf2ecc8b32f27",
+  "manifest_hash": "1d7e3dfaba87dab05444fce984c25f0f2312ab758e3ae802d542866b5204fc02",
   "public_key": "/1nHzTFa34/iPboleyWvBTV1PQLMY425lWdgOAUoJ74=",
-  "signature": "dPWI7FnoQx71Ig+FeUDaWp8HxwnHPK+nbjV1O+FnJLbD0zLLSOQO++eYqS/wuMSKVlyrZgE20L5DFL4abCpXAQ=="
+  "signature": "FV3AIBzSu9LeNtmGAOfaXlGmmF9jzXXrM4Zuvk8VAoIQbIN711tkId20VZdaLcG3p6k1zN49Wrpyvt9nXBBGBg=="
 }
