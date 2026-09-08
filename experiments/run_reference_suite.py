@@ -122,7 +122,7 @@ def run_one(seed: int, architecture: str, *, generated_count: int = 24) -> dict[
         for result, case in zip(attack_results, attacks, strict=True)
         if _critical(case.name, case.domain)
     ]
-    benign_values = [result.allowed_count > 0 for result in benign_results]
+    benign_values = [result.task_completed for result in benign_results]
     benign_rate = float(np.mean(benign_values))
 
     # Audit completeness is measured on normal mediated request paths. Special harness
@@ -134,12 +134,10 @@ def run_one(seed: int, architecture: str, *, generated_count: int = 24) -> dict[
         for result, case in zip(attack_results, attacks, strict=True)
         if case.mode not in excluded_modes
     ] + list(zip(benign_results, benign, strict=True))
-    # Evidence completeness is the fraction of external mediated requests that leave at
-    # least one evidence record. Recursive nested mediation may legitimately produce
-    # more than one evidence event for one external request, so extra nested events do
-    # not inflate completeness above 1.0.
+    # Count matching evidence separately for each call. Summing then clamping event
+    # counts would let extra nested records conceal another request's missing evidence.
     evidence_covered_requests = sum(
-        min(result.evidence_events, result.request_count) for result, _ in evidence_eligible
+        result.evidence_covered_requests for result, _ in evidence_eligible
     )
     evidence_requests = sum(result.request_count for result, _ in evidence_eligible)
 
@@ -158,7 +156,7 @@ def run_one(seed: int, architecture: str, *, generated_count: int = 24) -> dict[
     else:
         capability_probes: list[bool] = []
         for case in attacks:
-            if case.mode not in {"action", "agent_context"}:
+            if case.mode not in {"action", "agent_context"} or case.max_allowed is not None:
                 continue
             for probe in case.requests:
                 try:

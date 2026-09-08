@@ -33,10 +33,16 @@ The benchmark is local and simulated. It does not scan or exploit external syste
 
 `evidence_completeness` is the fraction of external mediated requests that leave at least one evidence record. Recursive nested actions may create additional evidence events, but those events cannot increase the external-request metric above 1.0.
 
+Coverage checks the request identity and nonce in newly appended events for each external request. An extra nested event cannot compensate for a different request with no record. `benign_task_completion_rate` requires every step of each benign task to complete successfully.
+
 `capability_overprivilege_rate` is the fraction of adversarial action proposals whose presented capability alone authorizes the canonical request before policy and invariant checks. Lifecycle, audit-tamper, delegation-model, and rate-limit harness modes are excluded because they test different properties. Architectures without a capability boundary are reported as fully exposed for this capability-layer metric.
 
 `policy_coverage` is the fraction of external scenario requests that reach an explicit policy rule. Recursive nested policy evaluations are additional internal mediation and do not inflate external coverage.
 
 Host-dependent decision-path and end-to-end request latency are measured separately with `make latency`. They are excluded from deterministic reference outputs and checksums.
 
+Runtime construction, signing-key setup and request preparation occur outside each timing interval. Periodic runtime resets used to avoid exhausted test budgets are also excluded. The resulting measurements cover the stated request paths and should be compared only with their accompanying environment metadata.
+
 The result definitions are benchmark-specific. For example, false-negative rate is the proportion of adversarial scenarios that achieve their prohibited objective under the benchmark success predicate. It should not be interpreted as a calibrated estimate for arbitrary real deployments.
+
+The aggregate `ci95_low` and `ci95_high` fields use a normal approximation across five fixed seeds. They describe variation within this bundled experiment and provide no deployment reliability guarantee. Repeated fixed scenarios across seeds are not independent new attack classes.

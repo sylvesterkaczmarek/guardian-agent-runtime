@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 permissions:
@@ -104,3 +105,20 @@ jobs:
           assert sandbox.environment.state.proxy_invocations == 0
           assert len(sandbox.evidence.events) == 2
           PY
+      - if: matrix.python-version == '3.12'
+        name: Test the installed wheel using the source distribution
+        run: |
+          python -c 'from setuptools.build_meta import build_sdist; build_sdist("dist")'
+          testdir="$(mktemp -d)"
+          tar -xzf dist/*.tar.gz -C "$testdir"
+          cd "$testdir"/*
+          /tmp/guardian-wheel-venv/bin/python - <<'PY'
+          from pathlib import Path
+          import guardian_runtime
+
+          module = Path(guardian_runtime.__file__).resolve()
+          assert module.is_relative_to(Path("/tmp/guardian-wheel-venv")), module
+          assert Path("formal/guardian.tla").is_file()
+          assert Path("results/checksums.sha256").is_file()
+          PY
+          /tmp/guardian-wheel-venv/bin/python -m pytest

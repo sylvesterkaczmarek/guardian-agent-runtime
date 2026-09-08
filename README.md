@@ -57,7 +57,7 @@ The static ACL is intentionally fairer than a broad allowlist. It contains only 
 The repository deliberately preserves cases where the approach fails or where stronger policy harms utility.
 
 - The initial Guardian permits a confused-deputy route through `proxy_call` because valid outer authority does not constrain hidden nested authority.
-- Even in the hardened architecture, the capability layer alone authorizes `0.425 ± 0.054` of adversarial action proposals before policy and invariant checks. The zero measured hardened attack-success rate therefore depends on layered enforcement rather than capabilities alone.
+- Even in the hardened architecture, the capability layer alone authorizes `0.343 ± 0.062` of adversarial action proposals before policy and invariant checks. The zero measured hardened attack-success rate therefore depends on layered enforcement rather than capabilities alone.
 - A deliberately overfit hardening rule that blocks only the observed `secret_read` route still permits `network_call` and `actuator_set` proxy routes.
 - An aggressive policy that blocks all network actions also blocks the legitimate mock-network task.
 - Compromise of the Guardian signing key allows a forged permit to bypass the hardened policy trust boundary.
@@ -92,6 +92,8 @@ The permit is:
 - rejected if the capability or any delegation ancestor has been revoked or expired
 
 The gateway rechecks state-dependent invariants immediately before execution.
+
+Concurrent calls through one runtime are serialised across authorization and execution, including recursive proxy calls. The gateway checks and executes a private copy of the request, so later changes to a caller's parameter dictionary cannot change an authorised action. This protects the in-process mediation path; tools and direct access to simulator state remain trusted.
 
 ## Capability model
 
@@ -130,11 +132,15 @@ Policies are YAML and fail closed on unknown fields, duplicate YAML keys, malfor
 
 Authorization and environment safety remain separate checks.
 
+Numeric limits must be finite, and counters and validity times must be integers rather than booleans or fractional values. Resource budgets use exact rational accumulation of the supplied decimal values, preventing small charges from disappearing when added to a large total. Invalid numeric or Unicode requests are rejected before execution and retained as diagnostic audit evidence.
+
 The runtime also emits opt-in structured operational events through Python logging. `JsonEventFormatter` produces one JSON object per record and intentionally excludes request parameters. The signed evidence chain remains the authoritative security audit record.
 
 ## Execution evidence
 
 Each mediated request produces an Ed25519-signed, hash-chained event containing the requested and normalized action, decision, reason, policy version, capability identifier, runtime-manifest hash, result digest, sequence number, and previous-event hash.
+
+Malformed verifier input produces a verification failure or input error. Cyclic, excessively nested or otherwise unsupported request and tool-output values are represented by explicit diagnostic markers so they cannot erase an audit event. These markers describe invalid values and do not reconstruct the original Python objects. Tool errors and interruptions after an execution attempt are recorded; the permit remains consumed because the tool may already have performed a partial action.
 
 A raw hash chain can detect modification, reordering, replay, and deletion from inside the chain. It cannot by itself prove that the final event was not removed. Guardian therefore exports a signed terminal checkpoint containing the event count and terminal hash.
 
@@ -190,6 +196,8 @@ Seeded adversarial generation adds parameter and nested-authority cases under fi
 The `prompt_injection`, `indirect_prompt_injection`, and `tool_output_poisoning` scenarios include a deterministic offline `ManipulatedAgent`. The same agent proposes a benign action without the hostile trigger and a prohibited action when hostile prompt or tool-output context is present. This makes the manipulation step explicit and reproducible, but it is not a language-model prompt-injection benchmark.
 
 `evidence_completeness` measures external mediated requests that leave at least one evidence event, with recursive nested evidence capped at one covered external request. `capability_overprivilege_rate` measures the fraction of adversarial action proposals whose presented capability alone authorizes the canonical request before policy and invariant checks. `policy_coverage` measures the fraction of external requests that reach an explicit policy rule. Internal recursive mediation does not inflate either coverage metric.
+
+Evidence coverage matches records to each request individually. Capability-only measurements exclude lifecycle, audit-tamper, delegation and rate-window harnesses. Benign completion requires every requested step to succeed. Latency measurements exclude runtime construction and request preparation.
 
 All execution is confined to bundled local simulators. The network tool records `mock://` targets and does not perform external networking.
 
@@ -252,6 +260,8 @@ make formal
 ```
 
 CI also runs TLC against [`formal/guardian.tla`](formal/guardian.tla) and [`formal/guardian.cfg`](formal/guardian.cfg). The bounded Python model remains a separate executable cross-check rather than a substitute for TLA+ model checking.
+
+Both models assume atomic execution and evidence append. They do not verify Python locking, filesystem durability or equivalence between the models and the implementation; those implementation paths have separate regression tests.
 
 ## Quick start
 

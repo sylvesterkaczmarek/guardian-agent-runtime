@@ -3,10 +3,11 @@ from __future__ import annotations
 import logging
 import time
 from collections.abc import Callable
+from dataclasses import replace
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-from guardian_runtime.canonical import CanonicalizationError, canonicalize_request, digest_json
+from guardian_runtime.canonical import CanonicalizationError, canonicalize_request, digest_json, normalize_json
 from guardian_runtime.capabilities import CapabilityStore
 from guardian_runtime.crypto import sign_object
 from guardian_runtime.evidence import EvidenceLog
@@ -35,8 +36,8 @@ class GuardianRuntime:
         logger: logging.Logger | None = None,
         mediate_nested_actions: bool = False,
     ) -> None:
-        if permit_ttl_seconds <= 0:
-            raise ValueError("permit_ttl_seconds must be positive")
+        if type(permit_ttl_seconds) is not int or permit_ttl_seconds <= 0:
+            raise ValueError("permit_ttl_seconds must be a positive integer")
         self.capabilities = capabilities
         self.policy = policy
         self.environment = environment
@@ -48,7 +49,8 @@ class GuardianRuntime:
         self.permit_ttl_seconds = permit_ttl_seconds
         self.logger = logger or logging.getLogger("guardian_runtime.runtime")
         self._permit_sequence = 0
-        self._permit_requests: dict[int, ActionRequest] = {}
+        self._permit_requests: dict[int, tuple[int, ActionRequest]] = {}
+        self._execution_lock = capabilities.transaction_lock
         self.policy_runtime = PolicyRuntimeState()
         self.gateway = ToolGateway(
             environment,
@@ -72,7 +74,7 @@ class GuardianRuntime:
         """
 
         decision, result = self.execute_request(request)
-        if decision.allowed and result is not None and result.ok:
+        if decision.allowed and result is not None:
             return result
         return ToolResult(
             False,
@@ -87,7 +89,8 @@ class GuardianRuntime:
         permit: ExecutionPermit,
         result: ToolResult,
     ) -> None:
-        original_request = self._permit_requests.pop(permit.sequence, request)
+        pending_request = self._permit_requests.pop(permit.sequence, None)
+        original_request = pending_request[1] if pending_request is not None else request
         decision = Decision(
             True,
             "authorized and invariant-safe",
@@ -139,7 +142,19 @@ class GuardianRuntime:
         )
 
     def evaluate(self, request: ActionRequest) -> Decision:
+        with self._execution_lock:
+            return self._evaluate_locked(request)
+
+    def _evaluate_locked(self, request: ActionRequest) -> Decision:
         now = self.clock()
+        if type(now) is not int or now < 0:
+            raise ValueError("clock must return a non-negative integer timestamp")
+        # Expired permits cannot execute. Release their retained request payloads,
+        # without refunding any reserved authority or clearing replay history.
+        self._permit_requests = {
+            sequence: pending for sequence, pending in self._permit_requests.items()
+            if now < pending[0]
+        }
         try:
             normalized = canonicalize_request(request)
         except CanonicalizationError as exc:
@@ -192,7 +207,17 @@ class GuardianRuntime:
             "runtime_manifest_hash": self.runtime_manifest_hash,
         }
         permit = ExecutionPermit(**unsigned, signature=sign_object(self.signing_key, unsigned))
-        self._permit_requests[permit.sequence] = request
+        # Keep an independent record of the submitted values. The caller retains
+        # mutable mappings both in its input and in the returned decision.
+        self._permit_requests[permit.sequence] = (
+            permit.expires_at,
+            replace(
+                normalized,
+                resource=request.resource,
+                params=normalize_json(normalized.params),
+                context=normalize_json(normalized.context),
+            ),
+        )
         return Decision(
             True,
             "authorized and invariant-safe",
@@ -202,6 +227,10 @@ class GuardianRuntime:
         )
 
     def execute_request(self, request: ActionRequest) -> tuple[Decision, ToolResult | None]:
+        with self._execution_lock:
+            return self._execute_request_locked(request)
+
+    def _execute_request_locked(self, request: ActionRequest) -> tuple[Decision, ToolResult | None]:
         decision = self.evaluate(request)
         if not decision.allowed or not decision.permit or not decision.normalized_request:
             self._record_nonexecution(request, decision)

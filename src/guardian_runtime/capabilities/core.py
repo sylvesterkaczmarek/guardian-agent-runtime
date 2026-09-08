@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import fnmatch
+import math
 from dataclasses import dataclass, field
 from collections.abc import Iterable, Mapping
+from threading import RLock
 from typing import Any
 
+from guardian_runtime.canonical import CanonicalizationError, normalize_json
 from guardian_runtime.types import ActionRequest
 
 
@@ -56,6 +59,10 @@ def _scope_pattern_subset(child: str, parent: str) -> bool:
 
 
 def _validate_constraint(name: str, constraint: Any) -> None:
+    try:
+        normalize_json(constraint)
+    except CanonicalizationError as exc:
+        raise CapabilityError(f"invalid constraint for {name}: {exc}") from exc
     if not isinstance(constraint, dict):
         return
     unknown = set(constraint) - _ALLOWED_CONSTRAINT_KEYS
@@ -83,12 +90,19 @@ def _validate_capability(capability: Capability) -> None:
         value = getattr(capability, field_name)
         if not isinstance(value, str) or not value:
             raise CapabilityError(f"{field_name} must be a non-empty string")
+    for field_name in ("not_before", "expires_at", "max_invocations", "delegation_depth"):
+        value = getattr(capability, field_name)
+        if not isinstance(value, int) or isinstance(value, bool):
+            raise CapabilityError(f"{field_name} must be an integer")
     if capability.not_before < 0 or capability.expires_at <= capability.not_before:
         raise CapabilityError("capability validity interval is invalid")
     if capability.max_invocations < 0:
         raise CapabilityError("max_invocations must be non-negative")
     if capability.delegation_depth < 0:
         raise CapabilityError("delegation_depth must be non-negative")
+    for field_name in ("prohibited_params", "purpose"):
+        if not isinstance(getattr(capability, field_name), (tuple, list)):
+            raise CapabilityError(f"{field_name} must be a sequence of strings")
     if not all(isinstance(item, str) and item for item in capability.prohibited_params):
         raise CapabilityError("prohibited_params must contain non-empty strings")
     if not all(isinstance(item, str) and item for item in capability.purpose):
@@ -111,7 +125,13 @@ def _validate_capability(capability: Capability) -> None:
 
 
 def _value_satisfies(value: Any, constraint: Any) -> bool:
+    if isinstance(value, float) and not math.isfinite(value):
+        return False
     if not isinstance(constraint, dict):
+        # Python equates True/1 and False/0, but numeric bounds exclude booleans.
+        # Literal delegation must preserve that distinction as well.
+        if isinstance(value, bool) != isinstance(constraint, bool):
+            return False
         return value == constraint
     if "enum" in constraint and value not in constraint["enum"]:
         return False
@@ -133,7 +153,7 @@ def _constraint_subset(child: Any, parent: Any) -> bool:
     """Return True only when every value accepted by child is accepted by parent."""
 
     if not isinstance(parent, dict):
-        return child == parent
+        return _value_satisfies(child, parent)
 
     parent_required = bool(parent.get("required", False))
     if not isinstance(child, dict):
@@ -222,12 +242,19 @@ def capability_is_subset(child: Capability, parent: Capability) -> bool:
 
 class CapabilityStore:
     def __init__(self, capabilities: Iterable[Capability] = ()) -> None:
+        self._lock = RLock()
         self._caps: dict[str, Capability] = {}
         self._revoked: set[str] = set()
         self._used_nonces: dict[str, set[str]] = {}
         self._invocations: dict[str, int] = {}
         for capability in capabilities:
             self.add(capability)
+
+    @property
+    def transaction_lock(self) -> RLock:
+        """Share the capability reservation and revocation boundary with a gateway."""
+
+        return self._lock
 
     def _lineage(self, capability: Capability) -> tuple[Capability, ...]:
         lineage: list[Capability] = [capability]
@@ -247,6 +274,10 @@ class CapabilityStore:
         return tuple(lineage)
 
     def add(self, capability: Capability) -> None:
+        with self._lock:
+            self._add(capability)
+
+    def _add(self, capability: Capability) -> None:
         _validate_capability(capability)
         if capability.capability_id in self._caps:
             raise CapabilityError("capability id already exists")
@@ -267,14 +298,22 @@ class CapabilityStore:
             raise
 
     def revoke(self, capability_id: str) -> None:
-        if capability_id not in self._caps:
-            raise CapabilityError("unknown capability")
-        self._revoked.add(capability_id)
+        with self._lock:
+            if capability_id not in self._caps:
+                raise CapabilityError("unknown capability")
+            self._revoked.add(capability_id)
 
     def get(self, capability_id: str) -> Capability | None:
-        return self._caps.get(capability_id)
+        with self._lock:
+            return self._caps.get(capability_id)
 
     def status(self, capability_id: str, now: int) -> tuple[bool, str]:
+        with self._lock:
+            return self._status(capability_id, now)
+
+    def _status(self, capability_id: str, now: int) -> tuple[bool, str]:
+        if not isinstance(now, int) or isinstance(now, bool) or now < 0:
+            return False, "capability time must be a non-negative integer"
         cap = self._caps.get(capability_id)
         if cap is None:
             return False, "unknown capability"
@@ -294,6 +333,10 @@ class CapabilityStore:
         return True, "capability active"
 
     def validate(self, request: ActionRequest, now: int, *, consume: bool = True) -> tuple[bool, str]:
+        with self._lock:
+            return self._validate(request, now, consume=consume)
+
+    def _validate(self, request: ActionRequest, now: int, *, consume: bool) -> tuple[bool, str]:
         cap = self._caps.get(request.capability_id)
         if cap is None:
             return False, "unknown capability"
@@ -346,18 +389,21 @@ class CapabilityStore:
         return True, "capability valid"
 
     def clone(self) -> "CapabilityStore":
-        clone = CapabilityStore(self._caps.values())
-        clone._revoked = set(self._revoked)
-        clone._used_nonces = {key: set(values) for key, values in self._used_nonces.items()}
-        clone._invocations = dict(self._invocations)
-        return clone
+        with self._lock:
+            clone = CapabilityStore(self._caps.values())
+            clone._revoked = set(self._revoked)
+            clone._used_nonces = {key: set(values) for key, values in self._used_nonces.items()}
+            clone._invocations = dict(self._invocations)
+            return clone
 
     def reset_usage(self) -> None:
-        self._used_nonces.clear()
-        self._invocations.clear()
+        with self._lock:
+            self._used_nonces.clear()
+            self._invocations.clear()
 
     def invocation_count(self, capability_id: str) -> int:
-        return self._invocations.get(capability_id, 0)
+        with self._lock:
+            return self._invocations.get(capability_id, 0)
 
 
 def capability_from_dict(data: Mapping[str, Any]) -> Capability:

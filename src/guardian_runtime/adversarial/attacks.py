@@ -41,6 +41,11 @@ class ScenarioResult:
     evidence_events: int
     explicit_rule_count: int
     notes: str
+    evidence_covered_requests: int = 0
+
+    @property
+    def task_completed(self) -> bool:
+        return self.request_count > 0 and self.allowed_count == self.request_count
 
 
 def request(
@@ -204,7 +209,21 @@ def attack_scenarios() -> tuple[Scenario, ...]:
 
 
 def _environment(domain: str):
-    return MissionEnvironment() if domain == "mission" else SandboxEnvironment()
+    if domain == "mission":
+        return MissionEnvironment()
+    if domain == "sandbox":
+        return SandboxEnvironment()
+    raise ValueError(f"unknown domain: {domain}")
+
+
+def _has_request_evidence(events, request: ActionRequest) -> bool:
+    # Match each external call within its own new-event window. Extra nested records
+    # must not cover another call, or stand in for its missing outer request record.
+    fields = ("subject", "session_id", "tool", "action", "capability_id", "nonce")
+    return any(
+        all(event.requested_action.get(field) == getattr(request, field) for field in fields)
+        for event in events
+    )
 
 
 def _elapsed_ms(start_ns: int | None) -> float | None:
@@ -220,10 +239,13 @@ def _run_action_sequence(
     measure_latency: bool = False,
     policy_path=None,
 ) -> ScenarioResult:
+    if architecture not in ARCHITECTURES:
+        raise ValueError(f"unknown architecture: {architecture}")
     allowed: list[bool] = []
     latencies: list[float] = []
     evidence_events = 0
     explicit_rule_count = 0
+    evidence_covered_requests = 0
 
     if architecture == "no_guardian":
         env = _environment(scenario.domain)
@@ -249,12 +271,16 @@ def _run_action_sequence(
         hardened = architecture == "guardian_hardened"
         runtime, _, _ = build_guardian(scenario.domain, hardened=hardened, policy_path=policy_path)
         for req in scenario.requests:
+            evidence_start = len(runtime.evidence.events)
             start = time.perf_counter_ns() if measure_latency else None
             decision, result = runtime.execute_request(req)
             elapsed = _elapsed_ms(start)
             if elapsed is not None:
                 latencies.append(elapsed)
             allowed.append(bool(decision.allowed and result and result.ok))
+            evidence_covered_requests += _has_request_evidence(
+                runtime.evidence.events[evidence_start:], req
+            )
             if decision.rule_id is not None:
                 explicit_rule_count += 1
         evidence_events = len(runtime.evidence.events)
@@ -277,6 +303,7 @@ def _run_action_sequence(
         evidence_events=evidence_events,
         explicit_rule_count=explicit_rule_count,
         notes=scenario.notes,
+        evidence_covered_requests=evidence_covered_requests,
     )
 
 
@@ -309,8 +336,15 @@ def _run_tamper(architecture: str, scenario: Scenario, *, tail_delete: bool = Fa
     if architecture in {"no_guardian", "static_acl"}:
         return ScenarioResult(scenario.name, architecture, True, 1, len(scenario.requests), None, 0, 0, "No signed evidence mechanism.")
     runtime, _, _ = build_guardian(scenario.domain, hardened=architecture == "guardian_hardened", policy_path=policy_path)
+    evidence_covered_requests = 0
+    allowed_count = 0
+    explicit_rule_count = 0
     for req in scenario.requests:
-        runtime.execute_request(req)
+        evidence_start = len(runtime.evidence.events)
+        decision, result = runtime.execute_request(req)
+        evidence_covered_requests += _has_request_evidence(runtime.evidence.events[evidence_start:], req)
+        allowed_count += bool(decision.allowed and result and result.ok)
+        explicit_rule_count += decision.rule_id is not None
     bundle = runtime.evidence.export_bundle(policy_version=runtime.policy.version)
     if tail_delete:
         bundle["events"] = bundle["events"][:-1]
@@ -321,12 +355,13 @@ def _run_tamper(architecture: str, scenario: Scenario, *, tail_delete: bool = Fa
         scenario.name,
         architecture,
         ok,
-        1,
+        allowed_count,
         len(scenario.requests),
         None,
         len(runtime.evidence.events),
-        1,
+        explicit_rule_count,
         "Attack succeeds only if modified evidence still verifies.",
+        evidence_covered_requests,
     )
 
 
@@ -468,5 +503,5 @@ def run_benign_scenario(
     result = _run_action_sequence(
         architecture, scenario, measure_latency=measure_latency, policy_path=policy_path
     )
-    # For benign scenarios, attack_success is reinterpreted by callers as task completion.
+    # task_completed requires every step of a nonempty benign task to succeed.
     return replace(result, attack_success=False)

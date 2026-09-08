@@ -29,7 +29,7 @@ def verify_object(public_key: Ed25519PublicKey, payload: Any, signature: str) ->
     try:
         public_key.verify(base64.b64decode(signature, validate=True), canonical_json(payload))
         return True
-    except (InvalidSignature, ValueError, TypeError, binascii.Error):
+    except (InvalidSignature, ValueError, TypeError, binascii.Error, RecursionError):
         return False
 
 

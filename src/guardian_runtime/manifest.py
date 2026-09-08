@@ -32,5 +32,5 @@ def verify_manifest(signed: SignedManifest, public_key: Ed25519PublicKey) -> boo
             {"manifest": dict(signed.manifest), "manifest_hash": signed.manifest_hash},
             signed.signature,
         )
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, RecursionError):
         return False

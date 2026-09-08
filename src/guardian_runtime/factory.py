@@ -52,12 +52,18 @@ def reference_config_path(group: str, name: str) -> Path:
 
 def load_capability_store(path: str | Path | None = None) -> CapabilityStore:
     config_path = Path(path) if path else _resource_path("capabilities", "reference.yaml")
+    return _capability_store_from_text(config_path.read_text(encoding="utf-8"))
+
+
+def _capability_store_from_text(text: str) -> CapabilityStore:
     try:
-        data = load_yaml_unique(config_path.read_text(encoding="utf-8"))
+        data = load_yaml_unique(text)
     except yaml.YAMLError as exc:
         raise ValueError(f"invalid or ambiguous capability YAML: {exc}") from exc
     if not isinstance(data, dict) or not isinstance(data.get("capabilities"), list):
         raise ValueError("capability configuration requires a capabilities list")
+    if set(data) != {"capabilities"}:
+        raise ValueError("capability configuration contains unknown fields")
     return CapabilityStore(capability_from_dict(item) for item in data["capabilities"])
 
 
@@ -90,17 +96,22 @@ def build_guardian(
     )
     selected_capabilities = Path(capability_path) if capability_path else _resource_path("capabilities", "reference.yaml")
     benchmark_config = _resource_path("benchmarks", "reference.yaml")
-    policy = PolicyEngine.from_file(selected_policy)
+    # Bind the manifest to the exact bytes parsed, even if a configuration file
+    # is replaced while the runtime is being constructed.
+    policy_bytes = selected_policy.read_bytes()
+    capability_bytes = selected_capabilities.read_bytes()
+    policy = PolicyEngine.from_text(policy_bytes.decode("utf-8"))
+    capabilities = _capability_store_from_text(capability_bytes.decode("utf-8"))
     signing_key = deterministic_private_key("guardian-agent-runtime-reference-key")
     source_hash = _package_source_hash()
     manifest = {
         "guardian_version": __version__,
         "policy_version": policy.version,
-        "policy_hash": hashlib.sha256(selected_policy.read_bytes()).hexdigest(),
+        "policy_hash": hashlib.sha256(policy_bytes).hexdigest(),
         "permitted_tools": [domain],
         "tool_versions": {domain: "sim-3"},
         "nested_action_mediation": "guardian-recursive" if nested_mediation else "tool-direct",
-        "configuration_hash": hashlib.sha256(selected_capabilities.read_bytes()).hexdigest(),
+        "configuration_hash": hashlib.sha256(capability_bytes).hexdigest(),
         "benchmark_configuration": "reference-v3",
         "benchmark_configuration_hash": hashlib.sha256(benchmark_config.read_bytes()).hexdigest(),
         "source_package_sha256": source_hash,
@@ -111,7 +122,7 @@ def build_guardian(
     }
     signed_manifest = sign_manifest(manifest, signing_key)
     runtime = GuardianRuntime(
-        capabilities=load_capability_store(selected_capabilities),
+        capabilities=capabilities,
         policy=policy,
         environment=environment,
         signing_key=signing_key,
