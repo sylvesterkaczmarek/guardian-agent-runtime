@@ -10,8 +10,10 @@
     "network_route_still_bypasses": true
   },
   "key_compromise": {
-    "forged_guardian_signature_bypasses_hardened_policy": true,
-    "interpretation": "Compromise of the Guardian signing key breaks the software trust boundary."
+    "forged_guardian_signature_bypasses_hardened_policy": false,
+    "forged_signature_bypasses_capability_scope": true,
+    "interpretation": "Execution-time policy checks block the original secret-read forgery. A compromised key can still forge a policy-allowed write without matching capability authority; protected signing keys remain essential.",
+    "original_secret_read_forgery_blocked": true
   },
   "policy_incompleteness": {
     "initial_proxy_bypass_succeeds": true,

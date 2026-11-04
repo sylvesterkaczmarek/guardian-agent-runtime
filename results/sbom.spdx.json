@@ -1,13 +1,13 @@
 {
   "SPDXID": "SPDXRef-DOCUMENT",
   "creationInfo": {
-    "created": "2026-08-08T00:00:00Z",
+    "created": "2026-11-04T00:00:00Z",
     "creators": [
       "Person: Sylvester Kaczmarek"
     ]
   },
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/sbom/0.3.1/reference-v3",
+  "documentNamespace": "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/sbom/0.4.0rc1/reference-v3",
   "name": "guardian-agent-runtime-reference-sbom",
   "packages": [
     {
@@ -17,7 +17,7 @@
       "licenseConcluded": "MIT",
       "name": "guardian-agent-runtime",
       "primaryPackagePurpose": "APPLICATION",
-      "versionInfo": "0.3.1"
+      "versionInfo": "0.4.0rc1"
     },
     {
       "SPDXID": "SPDXRef-Package-setuptools",

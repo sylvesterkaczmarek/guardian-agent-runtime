@@ -12,6 +12,26 @@ The central research question is:
 
 > How much security can an independent runtime reference monitor provide when the agent it supervises cannot itself be trusted?
 
+## Review candidate
+
+This branch prepares **0.4.0rc1**, an unpublished reliability candidate. It isolates
+loaded authority and signed evidence from mutable caller-owned objects, preserves
+JSON boolean types in constraints, rechecks time-sensitive policy at execution,
+and records malformed tool results as failed attempts. Existing action, permit
+and evidence formats remain unchanged. Review the [migration notes](docs/migration-0.4.md)
+and [audit record](docs/implementation-2026-11-04.md) before upgrading.
+
+Run the offline demonstration after installing the checkout:
+
+```bash
+python scripts/showcase.py --output ./guardian-showcase
+```
+
+The eight synthetic cases cover allowed and denied actions, permit replay,
+revocation, expired policy, malformed tool output and evidence tampering. Existing
+output directories are preserved. This is an account-free local simulator test,
+with no model calls, real actuators or external network actions.
+
 ## At a glance
 
 ```mermaid
@@ -60,7 +80,7 @@ The repository deliberately preserves cases where the approach fails or where st
 - Even in the hardened architecture, the capability layer alone authorizes `0.343 ± 0.062` of adversarial action proposals before policy and invariant checks. The zero measured hardened attack-success rate therefore depends on layered enforcement rather than capabilities alone.
 - A deliberately overfit hardening rule that blocks only the observed `secret_read` route still permits `network_call` and `actuator_set` proxy routes.
 - An aggressive policy that blocks all network actions also blocks the legitimate mock-network task.
-- Compromise of the Guardian signing key allows a forged permit to bypass the hardened policy trust boundary.
+- Execution-time policy checking blocks the original secret-read permit forgery. Signing-key compromise still permits a policy-allowed write without matching capability authority, so protected signing keys remain a required assumption.
 - A lower-level tool that performs an undeclared side effect can escape the Guardian's model of that tool's behavior.
 
 Machine-readable results are in [`results/negative_results.json`](results/negative_results.json).

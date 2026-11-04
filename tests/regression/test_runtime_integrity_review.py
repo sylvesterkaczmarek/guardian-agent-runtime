@@ -241,11 +241,16 @@ def test_policy_replacement_cannot_reuse_older_permit():
 def test_negative_constraints_retain_numeric_equivalence_but_not_boolean_aliases(operator):
     if operator == "forbid":
         store = CapabilityStore([Capability("c", "agent", "sandbox", "*", constraints={"v": {"forbid": [1]}})])
-        evaluate = lambda value: store.validate(request(params={"v": value}), 100, consume=False)[0]
+
+        def evaluate(value):
+            return store.validate(request(params={"v": value}), 100, consume=False)[0]
     else:
         constraint = {operator: [1] if operator == "not_in" else 1}
         engine = PolicyEngine(Policy("v", "deny", (PolicyRule("r", "allow", param_constraints={"v": constraint}),)))
-        evaluate = lambda value: engine.evaluate(request(params={"v": value}), RuntimeState(0, {}))[0]
+
+        def evaluate(value):
+            return engine.evaluate(request(params={"v": value}), RuntimeState(0, {}))[0]
+
     assert evaluate(True)
     assert not evaluate(1)
     assert not evaluate(1.0)
