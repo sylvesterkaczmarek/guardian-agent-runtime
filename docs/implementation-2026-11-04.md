@@ -45,9 +45,26 @@ Two older output tests now expect invalid-tool-result instead of success for opa
 or cyclic values. They still require an intact signed execution record. This is an
 intentional contract correction, described in the migration notes.
 
+## Dependency audit follow-up
+
+The first hosted candidate audit identified 40 known advisories across two existing
+locked dependencies: setuptools 83.0.0 and Pillow 12.3.0. The lock now uses patched
+setuptools 84.1.0 and Pillow 13.0.0. No vulnerability ignore list or weakened audit
+was introduced. The full reference artifacts, package checks and hosted CI are
+rerun against the updated lock. The initial failed audit remains in Actions history.
+
+## Figure encoding follow-up
+
+The first Linux reference regeneration matched all numerical and signed JSON
+outputs, but PNG compression bytes differed from macOS. Reference figures now keep
+the exact Agg RGBA pixels and use explicit Sub filtering and the standard-library
+fixed-Huffman encoder instead of platform-specific Pillow compression. Pixel-exact
+round-trip tests cover generated images, noncontiguous arrays and an Agg plot.
+The existing byte-for-byte checked-artifact gate remains unchanged.
+
 ## Executed implementation checks
 
-On macOS with Python 3.14.7, the complete suite passes 337 tests, compared with the
+On macOS with Python 3.14.7, the complete suite passes 345 tests, compared with the
 285-test baseline. Ruff passes and mypy checks all 36 runtime modules. The ten
 original audit probes, rerun unchanged from a separate directory, meet their
 expected outcomes. The eight-case offline showcase passes. The bounded Python

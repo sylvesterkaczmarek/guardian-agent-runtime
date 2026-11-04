@@ -27,7 +27,7 @@
       "licenseConcluded": "NOASSERTION",
       "name": "setuptools",
       "primaryPackagePurpose": "LIBRARY",
-      "versionInfo": "83.0.0"
+      "versionInfo": "84.1.0"
     },
     {
       "SPDXID": "SPDXRef-Package-wheel",
@@ -157,7 +157,7 @@
       "licenseConcluded": "NOASSERTION",
       "name": "pillow",
       "primaryPackagePurpose": "LIBRARY",
-      "versionInfo": "12.3.0"
+      "versionInfo": "13.0.0"
     },
     {
       "SPDXID": "SPDXRef-Package-pyparsing",

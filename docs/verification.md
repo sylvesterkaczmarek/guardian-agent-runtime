@@ -43,3 +43,12 @@ job. The formal checks are bounded model results, not a proof of the implementat
 
 Prompt 1 prepares a draft pull request only. Merge, final version, release and public
 installation verification remain Prompt 2 decisions. No release schedule is created.
+
+## Figure portability
+
+Reference plots use Matplotlib Agg with the locked dependencies. PNG serialization
+uses an explicit RGBA layout, Sub filtering and standard-library fixed-Huffman
+compression, excluding optional metadata. Pixel-level tests ensure serialization
+does not alter the plotted data. Full artifact equality is checked on hosted Linux;
+local repeated generations are also compared. This is evidence for the tested
+environments, not a promise for arbitrary font/rasterizer/library builds.

@@ -13,6 +13,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
+from experiments.figure_output import save_reference_png
 from experiments.negative_results import run_negative_results
 from guardian_runtime.adversarial import (
     ARCHITECTURES,
@@ -226,7 +227,7 @@ def _plot(summary: dict[str, Any], hardening: dict[str, Any]) -> None:
     plt.ylim(0, 1.05)
     plt.xticks(rotation=15, ha="right")
     plt.tight_layout()
-    plt.savefig(FIG / "attack_success_by_architecture.png", dpi=180, metadata={"Software": "Matplotlib"})
+    save_reference_png(plt.gcf(), FIG / "attack_success_by_architecture.png")
     plt.close()
 
     plt.figure(figsize=(8.5, 4.8))
@@ -235,7 +236,7 @@ def _plot(summary: dict[str, Any], hardening: dict[str, Any]) -> None:
     plt.ylim(0, 1.05)
     plt.xticks(rotation=15, ha="right")
     plt.tight_layout()
-    plt.savefig(FIG / "benign_completion_by_architecture.png", dpi=180, metadata={"Software": "Matplotlib"})
+    save_reference_png(plt.gcf(), FIG / "benign_completion_by_architecture.png")
     plt.close()
 
     plt.figure(figsize=(6.5, 5.2))
@@ -249,7 +250,7 @@ def _plot(summary: dict[str, Any], hardening: dict[str, Any]) -> None:
     plt.xlim(-0.05, 1.05)
     plt.ylim(-0.05, 1.05)
     plt.tight_layout()
-    plt.savefig(FIG / "safety_utility_frontier.png", dpi=180, metadata={"Software": "Matplotlib"})
+    save_reference_png(plt.gcf(), FIG / "safety_utility_frontier.png")
     plt.close()
 
     plt.figure(figsize=(8.5, 4.8))
@@ -258,7 +259,7 @@ def _plot(summary: dict[str, Any], hardening: dict[str, Any]) -> None:
     plt.ylim(0, 1.05)
     plt.xticks(rotation=15, ha="right")
     plt.tight_layout()
-    plt.savefig(FIG / "tampering_detection_by_architecture.png", dpi=180, metadata={"Software": "Matplotlib"})
+    save_reference_png(plt.gcf(), FIG / "tampering_detection_by_architecture.png")
     plt.close()
 
     history = hardening.get("history", [])
@@ -269,7 +270,7 @@ def _plot(summary: dict[str, Any], hardening: dict[str, Any]) -> None:
         plt.bar(["Initial policy", "Retained hardening"], [before, after])
         plt.ylabel("Successful bypass cases")
         plt.tight_layout()
-        plt.savefig(FIG / "hardening_bypass_elimination.png", dpi=180, metadata={"Software": "Matplotlib"})
+        save_reference_png(plt.gcf(), FIG / "hardening_bypass_elimination.png")
         plt.close()
 
 
