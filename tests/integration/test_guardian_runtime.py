@@ -385,7 +385,8 @@ def test_noncanonical_tool_output_cannot_break_execution_evidence(monkeypatch):
 
     decision, result = runtime.execute_request(valid)
 
-    assert decision.allowed and result and result.ok
+    assert decision.allowed and result and not result.ok
+    assert result.status == "invalid-tool-result"
     assert len(runtime.evidence.events) == 1
     assert runtime.evidence.events[0].result_digest
     bundle = runtime.evidence.export_bundle(policy_version=runtime.policy.version)

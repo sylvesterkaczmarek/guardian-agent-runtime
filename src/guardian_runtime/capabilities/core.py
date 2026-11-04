@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import fnmatch
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from collections.abc import Iterable, Mapping
 from threading import RLock
 from typing import Any
 
-from guardian_runtime.canonical import CanonicalizationError, normalize_json
+from guardian_runtime.canonical import CanonicalizationError, json_values_equal, normalize_json
 from guardian_runtime.types import ActionRequest
 
 
@@ -63,7 +63,7 @@ def _validate_constraint(name: str, constraint: Any) -> None:
         normalize_json(constraint)
     except CanonicalizationError as exc:
         raise CapabilityError(f"invalid constraint for {name}: {exc}") from exc
-    if not isinstance(constraint, dict):
+    if not isinstance(constraint, Mapping):
         return
     unknown = set(constraint) - _ALLOWED_CONSTRAINT_KEYS
     if unknown:
@@ -86,6 +86,8 @@ def _validate_constraint(name: str, constraint: Any) -> None:
 
 
 def _validate_capability(capability: Capability) -> None:
+    if not isinstance(capability, Capability):
+        raise CapabilityError("authority must be a Capability instance")
     for field_name in ("capability_id", "subject", "tool", "action", "resource", "session"):
         value = getattr(capability, field_name)
         if not isinstance(value, str) or not value:
@@ -124,16 +126,20 @@ def _validate_capability(capability: Capability) -> None:
         _validate_constraint(name, constraint)
 
 
+def _snapshot_capability(capability: Capability) -> Capability:
+    _validate_capability(capability)
+    return replace(
+        capability, constraints=normalize_json(capability.constraints),
+        purpose=tuple(capability.purpose), prohibited_params=tuple(capability.prohibited_params),
+    )
+
+
 def _value_satisfies(value: Any, constraint: Any) -> bool:
     if isinstance(value, float) and not math.isfinite(value):
         return False
-    if not isinstance(constraint, dict):
-        # Python equates True/1 and False/0, but numeric bounds exclude booleans.
-        # Literal delegation must preserve that distinction as well.
-        if isinstance(value, bool) != isinstance(constraint, bool):
-            return False
-        return value == constraint
-    if "enum" in constraint and value not in constraint["enum"]:
+    if not isinstance(constraint, Mapping):
+        return json_values_equal(value, constraint)
+    if "enum" in constraint and not any(json_values_equal(value, item) for item in constraint["enum"]):
         return False
     if "min" in constraint:
         if not isinstance(value, (int, float)) or isinstance(value, bool) or value < constraint["min"]:
@@ -144,7 +150,7 @@ def _value_satisfies(value: Any, constraint: Any) -> bool:
     if "prefix" in constraint:
         if not isinstance(value, str) or not value.startswith(str(constraint["prefix"])):
             return False
-    if "forbid" in constraint and value in constraint["forbid"]:
+    if "forbid" in constraint and any(json_values_equal(value, item) for item in constraint["forbid"]):
         return False
     return True
 
@@ -152,11 +158,11 @@ def _value_satisfies(value: Any, constraint: Any) -> bool:
 def _constraint_subset(child: Any, parent: Any) -> bool:
     """Return True only when every value accepted by child is accepted by parent."""
 
-    if not isinstance(parent, dict):
+    if not isinstance(parent, Mapping):
         return _value_satisfies(child, parent)
 
     parent_required = bool(parent.get("required", False))
-    if not isinstance(child, dict):
+    if not isinstance(child, Mapping):
         # A scalar constraint does not require the parameter to be present, so it cannot
         # preserve a parent's presence requirement.
         return not parent_required and _value_satisfies(child, parent)
@@ -167,7 +173,7 @@ def _constraint_subset(child: Any, parent: Any) -> bool:
     if "enum" in parent:
         if "enum" in child:
             child_enum = child["enum"]
-            if not child_enum or not all(value in parent["enum"] for value in child_enum):
+            if not child_enum or not all(any(json_values_equal(value, item) for item in parent["enum"]) for value in child_enum):
                 return False
         elif any(key in child for key in ("min", "max", "prefix")):
             return False
@@ -185,7 +191,7 @@ def _constraint_subset(child: Any, parent: Any) -> bool:
         if child_prefix is None or not str(child_prefix).startswith(str(parent["prefix"])):
             return False
     if "forbid" in parent and not all(
-        value in child.get("forbid", []) for value in parent["forbid"]
+        any(json_values_equal(value, item) for item in child.get("forbid", [])) for value in parent["forbid"]
     ):
         return False
     return True
@@ -225,7 +231,7 @@ def capability_is_subset(child: Capability, parent: Capability) -> bool:
     # may be omitted entirely by the child, which is a narrowing because undeclared
     # parameters are rejected by validation.
     for key, parent_constraint in parent.constraints.items():
-        required = isinstance(parent_constraint, dict) and bool(parent_constraint.get("required", False))
+        required = isinstance(parent_constraint, Mapping) and bool(parent_constraint.get("required", False))
         if key not in child.constraints:
             if required:
                 return False
@@ -278,7 +284,7 @@ class CapabilityStore:
             self._add(capability)
 
     def _add(self, capability: Capability) -> None:
-        _validate_capability(capability)
+        capability = _snapshot_capability(capability)
         if capability.capability_id in self._caps:
             raise CapabilityError("capability id already exists")
         if capability.parent_id:
@@ -305,7 +311,8 @@ class CapabilityStore:
 
     def get(self, capability_id: str) -> Capability | None:
         with self._lock:
-            return self._caps.get(capability_id)
+            capability = self._caps.get(capability_id)
+            return _snapshot_capability(capability) if capability is not None else None
 
     def status(self, capability_id: str, now: int) -> tuple[bool, str]:
         with self._lock:
@@ -379,7 +386,7 @@ class CapabilityStore:
             if not _value_satisfies(value, cap.constraints[key]):
                 return False, f"parameter outside capability: {key}"
         for key, constraint in cap.constraints.items():
-            if isinstance(constraint, dict) and constraint.get("required") and key not in request.params:
+            if isinstance(constraint, Mapping) and constraint.get("required") and key not in request.params:
                 return False, f"missing required parameter: {key}"
 
         if consume:

@@ -14,7 +14,7 @@ from guardian_runtime.evidence import EvidenceLog
 from guardian_runtime.policy import PolicyEngine, PolicyRuntimeState
 from guardian_runtime.telemetry import log_event
 from guardian_runtime.tools import PermitError, ToolGateway
-from guardian_runtime.types import ActionRequest, Decision, ExecutionPermit, ToolResult
+from guardian_runtime.types import ActionRequest, Decision, ExecutionPermit, RuntimeState, ToolResult
 
 
 Clock = Callable[[], int]
@@ -61,9 +61,17 @@ class GuardianRuntime:
             runtime_manifest_hash=runtime_manifest_hash,
             on_execution=self._record_executed_action,
             mediate_nested_actions=mediate_nested_actions,
+            execution_policy_check=self._revalidate_execution,
         )
         if mediate_nested_actions:
             self.gateway.set_nested_executor(self._execute_nested_request)
+
+    def _revalidate_execution(
+        self, request: ActionRequest, permit: ExecutionPermit, state: RuntimeState, now: int,
+    ) -> tuple[bool, str]:
+        if self.policy.version != permit.policy_version:
+            return False, "policy version changed after authorization"
+        return self.policy.revalidate_execution(request, state, now=now, authorized_rule_id=permit.rule_id)
 
     def _execute_nested_request(self, request: ActionRequest) -> ToolResult:
         """Execute a tool-composition target through a fresh Guardian authorization.
@@ -193,6 +201,10 @@ class GuardianRuntime:
         )
 
         self._permit_sequence += 1
+        expires_at = min(now + self.permit_ttl_seconds, capability.expires_at)
+        policy_deadline = self.policy.authorization_deadline(rule_id)
+        if policy_deadline is not None:
+            expires_at = min(expires_at, policy_deadline)
         unsigned = {
             "request_hash": digest_json(normalized.to_dict()),
             "policy_version": self.policy.version,
@@ -200,7 +212,7 @@ class GuardianRuntime:
             "subject": normalized.subject,
             "session_id": normalized.session_id,
             "issued_at": now,
-            "expires_at": min(now + self.permit_ttl_seconds, capability.expires_at),
+            "expires_at": expires_at,
             "sequence": self._permit_sequence,
             "state_version": state.version,
             "rule_id": rule_id,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from dataclasses import replace
 
 from guardian_runtime.adversarial import attack_scenarios, benign_scenarios, generated_attack_scenarios
 from guardian_runtime.canonical import digest_json
@@ -8,6 +9,7 @@ from guardian_runtime.crypto import sign_object
 from guardian_runtime.factory import ROOT, build_guardian
 from guardian_runtime.simulator import SandboxEnvironment
 from guardian_runtime.types import ActionRequest, ExecutionPermit
+from guardian_runtime.tools import PermitError
 
 
 class ContractViolatingSandbox(SandboxEnvironment):
@@ -64,10 +66,9 @@ def run_negative_results() -> dict[str, Any]:
     aggressive_decision, aggressive_result = aggressive_runtime.execute_request(network_benign.requests[0])
     aggressive_overblocks_benign = not bool(aggressive_decision.allowed and aggressive_result and aggressive_result.ok)
 
-    # Signing-key compromise: forge a permit for an action that the capability allows
-    # structurally but the hardened policy explicitly denies. The gateway trusts the
-    # Guardian signature as proof that policy evaluation occurred, so key compromise
-    # defeats that trust boundary. This is expected and documented as out of scope.
+    # Preserve the original secret-read forgery. Execution-time policy checking now
+    # blocks it. A second policy-allowed write demonstrates the remaining key trust:
+    # forged authorization can claim a capability that never granted that action.
     forged_runtime, _, _ = build_guardian("sandbox", hardened=True)
     forged_request = ActionRequest(
         subject="agent-1",
@@ -93,8 +94,25 @@ def run_negative_results() -> dict[str, Any]:
         "runtime_manifest_hash": forged_runtime.runtime_manifest_hash,
     }
     forged_permit = ExecutionPermit(**unsigned, signature=sign_object(forged_runtime.signing_key, unsigned))
-    forged_result = forged_runtime.gateway.execute(forged_request, forged_permit)
-    key_compromise_bypasses_policy = forged_result.ok and "secret" in forged_result.output
+    try:
+        forged_result = forged_runtime.gateway.execute(forged_request, forged_permit)
+        key_compromise_bypasses_policy = forged_result.ok and "secret" in forged_result.output
+    except PermitError:
+        key_compromise_bypasses_policy = False
+
+    wrong_scope_request = replace(
+        forged_request, action="write_file", resource="/tmp/key-compromise.txt",
+        capability_id="cap-observe", params={"content": "synthetic-only"}, nonce="forged-write",
+    )
+    wrong_scope_rejected_normally = not forged_runtime.evaluate(wrong_scope_request).allowed
+    write_payload = {**unsigned, "request_hash": digest_json(wrong_scope_request.to_dict()),
+                     "capability_id": wrong_scope_request.capability_id, "rule_id": "allow-write", "sequence": 1000}
+    write_permit = ExecutionPermit(**write_payload, signature=sign_object(forged_runtime.signing_key, write_payload))
+    forged_write = forged_runtime.gateway.execute(wrong_scope_request, write_permit)
+    key_compromise_bypasses_capability = bool(
+        wrong_scope_rejected_normally and forged_write.ok
+        and forged_runtime.environment.state.files.get(wrong_scope_request.resource) == "synthetic-only"
+    )
 
     compromised_env = ContractViolatingSandbox()
     compromised_runtime, _, _ = build_guardian(
@@ -125,7 +143,9 @@ def run_negative_results() -> dict[str, Any]:
         },
         "key_compromise": {
             "forged_guardian_signature_bypasses_hardened_policy": key_compromise_bypasses_policy,
-            "interpretation": "Compromise of the Guardian signing key breaks the software trust boundary.",
+            "original_secret_read_forgery_blocked": not key_compromise_bypasses_policy,
+            "forged_signature_bypasses_capability_scope": key_compromise_bypasses_capability,
+            "interpretation": "Execution-time policy checks block the original secret-read forgery. A compromised key can still forge a policy-allowed write without matching capability authority; protected signing keys remain essential.",
         },
         "compromised_tool": {
             "undeclared_tool_side_effect_escapes_guardian_model": compromised_tool_side_effect_escapes_model,

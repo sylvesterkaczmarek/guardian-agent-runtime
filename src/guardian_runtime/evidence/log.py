@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from copy import deepcopy
 import re
 from dataclasses import asdict, dataclass
 from collections.abc import Iterable, Mapping
@@ -177,7 +178,7 @@ class EvidenceLog:
     @property
     def events(self) -> tuple[EvidenceEvent, ...]:
         with self._lock:
-            return tuple(self._events)
+            return tuple(deepcopy(self._events))
 
     def append(
         self,
@@ -214,7 +215,7 @@ class EvidenceLog:
             signature = sign_object(self._private_key, signed_payload)
             event = EvidenceEvent(**signed_payload, signature=signature)
             self._events.append(event)
-            return event
+            return deepcopy(event)
 
     def export(self) -> list[dict[str, Any]]:
         """Export raw events.

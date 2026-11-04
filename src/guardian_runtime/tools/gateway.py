@@ -1,21 +1,21 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import asdict
 from typing import Protocol
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-from guardian_runtime.canonical import canonicalize_request, digest_json
+from guardian_runtime.canonical import canonicalize_request, digest_json, normalize_json
 from guardian_runtime.capabilities import CapabilityStore
 from guardian_runtime.crypto import verify_object
-from guardian_runtime.types import ActionRequest, ExecutionPermit, ToolResult
+from guardian_runtime.types import ActionRequest, ExecutionPermit, RuntimeState, ToolResult
 
 
 class Environment(Protocol):
     def execute(self, request: ActionRequest) -> ToolResult: ...
 
-    def snapshot(self): ...
+    def snapshot(self) -> RuntimeState: ...
 
     def check_invariants(self, request: ActionRequest) -> tuple[bool, str]: ...
 
@@ -31,6 +31,7 @@ class PermitError(PermissionError):
 ExecutionObserver = Callable[[ActionRequest, ExecutionPermit, ToolResult], None]
 NestedExecutor = Callable[[ActionRequest], ToolResult]
 Clock = Callable[[], int]
+ExecutionPolicyCheck = Callable[[ActionRequest, ExecutionPermit, RuntimeState, int], tuple[bool, str]]
 
 
 class ToolGateway:
@@ -47,6 +48,7 @@ class ToolGateway:
         runtime_manifest_hash: str,
         on_execution: ExecutionObserver | None = None,
         mediate_nested_actions: bool = False,
+        execution_policy_check: ExecutionPolicyCheck | None = None,
     ) -> None:
         self._environment = environment
         self._public_key = guardian_public_key
@@ -55,6 +57,7 @@ class ToolGateway:
         self._policy_version = policy_version
         self._runtime_manifest_hash = runtime_manifest_hash
         self._on_execution = on_execution
+        self._execution_policy_check = execution_policy_check
         self._mediate_nested_actions = mediate_nested_actions
         self._nested_executor: NestedExecutor | None = None
         self._used_permits: set[str] = set()
@@ -119,8 +122,13 @@ class ToolGateway:
         active, reason = self._capabilities.status(permit.capability_id, now)
         if not active:
             raise PermitError(f"capability no longer active: {reason}")
-        if self._environment.snapshot().version != permit.state_version:
+        state = self._environment.snapshot()
+        if state.version != permit.state_version:
             raise PermitError("runtime state changed after permit issuance")
+        if self._execution_policy_check is not None:
+            allowed, reason = self._execution_policy_check(request, permit, state, now)
+            if not allowed:
+                raise PermitError(f"execution policy check failed: {reason}")
         invariant_ok, invariant_reason = self._environment.check_invariants(request)
         if not invariant_ok:
             raise PermitError(f"pre-execution invariant check failed: {invariant_reason}")
@@ -145,6 +153,10 @@ class ToolGateway:
                 )
             else:
                 result = self._environment.execute(request)
+            try:
+                result = self._snapshot_result(result)
+            except (TypeError, ValueError) as exc:
+                result = self._failed_execution("invalid-tool-result", exc)
         except (KeyboardInterrupt, SystemExit) as exc:
             result = self._failed_execution("tool-interrupted", exc)
             if self._on_execution is not None:
@@ -158,6 +170,19 @@ class ToolGateway:
         if self._on_execution is not None:
             self._on_execution(request, permit, result)
         return result
+
+    @staticmethod
+    def _snapshot_result(result: ToolResult) -> ToolResult:
+        if not isinstance(result, ToolResult):
+            raise TypeError("tool must return ToolResult")
+        if type(result.ok) is not bool or not isinstance(result.status, str) or not result.status:
+            raise ValueError("tool result requires boolean ok and a non-empty status")
+        normalize_json(result.status)
+        if not isinstance(result.output, Mapping):
+            raise ValueError("tool result output must be a mapping")
+        if result.state_version is not None and (type(result.state_version) is not int or result.state_version < 0):
+            raise ValueError("tool result state version must be non-negative integer or null")
+        return ToolResult(result.ok, result.status, normalize_json(result.output, max_depth=64), result.state_version)
 
     def _failed_execution(self, status: str, exc: BaseException) -> ToolResult:
         try:
