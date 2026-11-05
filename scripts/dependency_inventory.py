@@ -4,8 +4,13 @@ import hashlib
 import json
 import re
 import sys
+import tomllib
 from pathlib import Path
 
+
+PROJECT_NAME = tomllib.loads(
+    (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text(encoding="utf-8")
+)["project"]["name"]
 
 PIN = re.compile(r"^([A-Za-z0-9_.-]+)==([^\s;]+)$")
 
@@ -82,7 +87,7 @@ def dependency_edges(packages: list[dict[str, str]]) -> list[dict[str, str]]:
         if item["scope"] != "transitive":
             edges.append(
                 {
-                    "from": "guardian-agent-runtime",
+                    "from": PROJECT_NAME,
                     "to": item["name"],
                     "scope": item["scope"],
                 }
@@ -106,7 +111,7 @@ def dependency_edges(packages: list[dict[str, str]]) -> list[dict[str, str]]:
                 }
             )
 
-    inbound = {canonical_name(edge["to"]) for edge in edges if edge["from"] != "guardian-agent-runtime"}
+    inbound = {canonical_name(edge["to"]) for edge in edges if edge["from"] != PROJECT_NAME}
     orphaned_transitive = sorted(
         item["name"]
         for item in packages
