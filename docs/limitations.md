@@ -29,3 +29,26 @@ A lower-level tool can also violate its declared contract. The checked negative 
 The aggressive-policy experiment shows the opposite failure mode. Blanket restrictions can reduce useful task completion even when they reduce available authority.
 
 The initial proxy confused-deputy result remains the principal policy-composition failure. Valid outer proxy authority is insufficient when the lower-level tool can exercise hidden nested authority. The hardened architecture closes the included proxy class by requiring a separately scoped nested capability and recursively mediating the nested action through Guardian. This does not prove that every possible higher-order tool composition or external tool implementation is correctly modeled.
+
+## Candidate boundary changes
+
+The 0.4 candidate owns snapshots of capability and policy definitions and returns
+detached evidence records. These measures prevent accidental alias mutation; they
+are not isolation against arbitrary Python code in the monitor process. Construct
+a new runtime to install a new reviewed policy/configuration and manifest.
+
+Execution-time checks re-evaluate emergency restrictions, temporal deny/escalate
+rules and the original allow rule. Rate, sequence and resource accounting remain
+authorization reservations and are not charged again. This does not establish
+real-time scheduling, trusted wall-clock synchronization or crash-safe logging.
+
+Verifier files are limited to 32 MiB and 128 JSON nesting levels. The byte limit
+bounds input reads, not the entire process's heap. Capability, policy and tool
+adapters remain trusted integration components. Non-JSON tool results now become
+failed, audited attempts; partial side effects cannot be undone automatically.
+
+The original compromised-key secret-read forgery is now rejected by execution-time
+policy checking. A separate retained example demonstrates a forged policy-allowed
+write outside the presented capability's scope. Key compromise therefore remains
+outside the protected assumptions. Neither example is evidence of attacks on an
+external system.

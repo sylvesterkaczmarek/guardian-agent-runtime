@@ -6,7 +6,7 @@ from pathlib import Path
 
 from guardian_runtime.crypto import load_public_key_b64
 from guardian_runtime.manifest import SignedManifest, verify_manifest
-from guardian_runtime.jsonutil import loads_unique
+from guardian_runtime.jsonutil import read_json_file
 from guardian_runtime.verifier._output import print_result
 
 
@@ -21,7 +21,7 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        payload = loads_unique(args.manifest.read_text(encoding="utf-8"))
+        payload = read_json_file(args.manifest)
     except (OSError, ValueError) as exc:
         print_result(f"invalid manifest file: {exc}")
         return 2

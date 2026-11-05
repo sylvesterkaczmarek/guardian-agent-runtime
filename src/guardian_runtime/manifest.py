@@ -6,7 +6,7 @@ from typing import Any
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
-from guardian_runtime.canonical import digest_json
+from guardian_runtime.canonical import digest_json, normalize_json
 from guardian_runtime.crypto import sign_object, verify_object
 
 
@@ -18,6 +18,8 @@ class SignedManifest:
 
 
 def sign_manifest(manifest: Mapping[str, Any], private_key: Ed25519PrivateKey) -> SignedManifest:
+    # Bind an owned snapshot; callers must not mutate signed nested data by alias.
+    manifest = normalize_json(manifest)
     manifest_hash = digest_json(manifest)
     payload = {"manifest": dict(manifest), "manifest_hash": manifest_hash}
     return SignedManifest(manifest=dict(manifest), manifest_hash=manifest_hash, signature=sign_object(private_key, payload))

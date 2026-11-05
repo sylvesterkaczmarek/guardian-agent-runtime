@@ -58,6 +58,31 @@ def _normalize_json(value: Any, *, depth: int, max_depth: int) -> Any:
     return _normalize_scalar(value)
 
 
+def json_values_equal(left: Any, right: Any) -> bool:
+    """Compare JSON values without Python's bool/integer equivalence.
+
+    JSON numbers retain numeric equality (1 and 1.0); booleans remain a distinct
+    type, including inside arrays and objects. Inputs are validated separately.
+    """
+    if isinstance(left, bool) or isinstance(right, bool):
+        return type(left) is bool and type(right) is bool and left is right
+    if isinstance(left, Mapping) or isinstance(right, Mapping):
+        return (
+            isinstance(left, Mapping) and isinstance(right, Mapping)
+            and left.keys() == right.keys()
+            and all(json_values_equal(left[key], right[key]) for key in left)
+        )
+    if isinstance(left, (list, tuple)) or isinstance(right, (list, tuple)):
+        return (
+            isinstance(left, (list, tuple)) and isinstance(right, (list, tuple))
+            and len(left) == len(right)
+            and all(json_values_equal(a, b) for a, b in zip(left, right, strict=True))
+        )
+    if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+        return left == right
+    return type(left) is type(right) and left == right
+
+
 def canonical_json(value: Any) -> bytes:
     normalized = normalize_json(value)
     return json.dumps(

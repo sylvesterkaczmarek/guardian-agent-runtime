@@ -1,6 +1,6 @@
 # Fully pinned reference environment for CPython 3.12/3.13 on Linux.
 # Runtime and development dependencies, including transitive packages used by the reference suite.
-setuptools==83.0.0
+setuptools==84.1.0
 wheel==0.46.3
 cryptography==50.0.0
 cffi==2.0.0
@@ -13,7 +13,7 @@ cycler==0.12.1
 fonttools==4.63.0
 kiwisolver==1.5.0
 packaging==25.0
-pillow==12.3.0
+pillow==13.0.0
 pyparsing==3.3.2
 python-dateutil==2.9.0.post0
 six==1.17.0

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import fnmatch
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from fractions import Fraction
 from pathlib import Path
 from collections.abc import Mapping
@@ -10,7 +10,7 @@ from typing import Any, TypeGuard
 
 import yaml
 
-from guardian_runtime.canonical import CanonicalizationError, canonicalize_resource, normalize_json
+from guardian_runtime.canonical import CanonicalizationError, canonicalize_resource, json_values_equal, normalize_json
 from guardian_runtime.types import ActionRequest, RuntimeState
 from guardian_runtime.yamlutil import load_yaml_unique
 
@@ -119,7 +119,7 @@ def _validate_constraint(name: str, constraint: Any) -> None:
         normalize_json(constraint)
     except CanonicalizationError as exc:
         raise PolicyError(f"invalid constraint for {name}: {exc}") from exc
-    if not isinstance(constraint, dict):
+    if not isinstance(constraint, Mapping):
         return
     unknown = set(constraint) - _ALLOWED_CONSTRAINT_KEYS
     if unknown:
@@ -147,15 +147,15 @@ def _validate_constraint(name: str, constraint: Any) -> None:
 def _matches_constraint(value: Any, constraint: Any) -> bool:
     if isinstance(value, float) and not math.isfinite(value):
         return False
-    if not isinstance(constraint, dict):
-        return value == constraint
-    if "eq" in constraint and value != constraint["eq"]:
+    if not isinstance(constraint, Mapping):
+        return json_values_equal(value, constraint)
+    if "eq" in constraint and not json_values_equal(value, constraint["eq"]):
         return False
-    if "neq" in constraint and value == constraint["neq"]:
+    if "neq" in constraint and json_values_equal(value, constraint["neq"]):
         return False
-    if "in" in constraint and value not in constraint["in"]:
+    if "in" in constraint and not any(json_values_equal(value, item) for item in constraint["in"]):
         return False
-    if "not_in" in constraint and value in constraint["not_in"]:
+    if "not_in" in constraint and any(json_values_equal(value, item) for item in constraint["not_in"]):
         return False
     if "min" in constraint:
         if not isinstance(value, (int, float)) or isinstance(value, bool) or value < constraint["min"]:
@@ -211,9 +211,11 @@ def _budget_amount(value: Fraction | float) -> Fraction:
 
 
 def _validate_rule(rule: PolicyRule) -> None:
+    if not isinstance(rule, PolicyRule):
+        raise PolicyError("rules must contain PolicyRule instances")
     if not isinstance(rule.rule_id, str) or not rule.rule_id:
         raise PolicyError("rule id must be a non-empty string")
-    if rule.effect not in {"allow", "deny", "escalate"}:
+    if not isinstance(rule.effect, str) or rule.effect not in {"allow", "deny", "escalate"}:
         raise PolicyError("rule effect must be allow, deny, or escalate")
     for name in ("subject", "session", "tool", "action", "resource"):
         if not isinstance(getattr(rule, name), str):
@@ -271,7 +273,7 @@ def _rule_matches(rule: PolicyRule, request: ActionRequest, state: RuntimeState,
 
     for key, constraint in rule.param_constraints.items():
         if key not in request.params:
-            if isinstance(constraint, dict) and constraint.get("required"):
+            if isinstance(constraint, Mapping) and constraint.get("required"):
                 return False
             continue
         if not _matches_constraint(request.params[key], constraint):
@@ -285,16 +287,34 @@ def _rule_matches(rule: PolicyRule, request: ActionRequest, state: RuntimeState,
     return True
 
 
+def _snapshot_policy(policy: Policy) -> Policy:
+    rules = tuple(replace(
+        rule, param_constraints=normalize_json(rule.param_constraints),
+        state_constraints=normalize_json(rule.state_constraints), purpose=tuple(rule.purpose),
+        forbidden_after=tuple(rule.forbidden_after), separation_of_duty_after=tuple(rule.separation_of_duty_after),
+    ) for rule in policy.rules)
+    emergency = policy.emergency_stop
+    if emergency is not None:
+        emergency = replace(emergency, equals=normalize_json(emergency.equals), allow_actions=tuple(emergency.allow_actions))
+    return replace(policy, rules=rules, emergency_stop=emergency)
+
+
 class PolicyEngine:
     def __init__(self, policy: Policy) -> None:
+        if not isinstance(policy, Policy):
+            raise PolicyError("policy must be a Policy instance")
         if not isinstance(policy.version, str) or not policy.version:
             raise PolicyError("policy requires a string version")
-        if policy.default not in {"allow", "deny"}:
+        if not isinstance(policy.default, str) or policy.default not in {"allow", "deny"}:
             raise PolicyError("policy default must be allow or deny")
+        if not isinstance(policy.rules, (list, tuple)):
+            raise PolicyError("policy rules must be a sequence")
         for rule in policy.rules:
             _validate_rule(rule)
         if policy.emergency_stop is not None:
             emergency = policy.emergency_stop
+            if not isinstance(emergency, EmergencyStop):
+                raise PolicyError("emergency_stop must be an EmergencyStop instance")
             if not isinstance(emergency.state_key, str) or not emergency.state_key:
                 raise PolicyError("emergency_stop requires state_key")
             if not isinstance(emergency.allow_actions, (list, tuple)) or not all(
@@ -308,11 +328,16 @@ class PolicyEngine:
         ids = [rule.rule_id for rule in policy.rules]
         if len(ids) != len(set(ids)):
             raise PolicyError("policy rule ids must be unique")
-        self.policy = policy
+        self._policy = _snapshot_policy(policy)
+
+    @property
+    def policy(self) -> Policy:
+        """Return a detached configuration snapshot, never live authority."""
+        return _snapshot_policy(self._policy)
 
     @property
     def version(self) -> str:
-        return self.policy.version
+        return self._policy.version
 
     def evaluate(
         self,
@@ -325,20 +350,20 @@ class PolicyEngine:
         if not isinstance(now, int) or isinstance(now, bool) or now < 0:
             return False, "policy time must be a non-negative integer", None
         runtime = runtime or PolicyRuntimeState()
-        emergency = self.policy.emergency_stop
-        if emergency is not None and state.values.get(emergency.state_key) == emergency.equals:
+        emergency = self._policy.emergency_stop
+        if emergency is not None and json_values_equal(state.values.get(emergency.state_key), emergency.equals):
             if _action_key(request) not in emergency.allow_actions:
                 return False, "denied by emergency-stop policy", "emergency-stop"
 
         # Explicit deny and escalation rules take precedence over allow rules.
-        for rule in self.policy.rules:
+        for rule in self._policy.rules:
             if rule.effect not in {"deny", "escalate"} or not _rule_matches(rule, request, state, now):
                 continue
             if rule.effect == "escalate":
                 return False, f"escalation required by policy rule {rule.rule_id}", rule.rule_id
             return False, f"denied by policy rule {rule.rule_id}", rule.rule_id
 
-        for rule in self.policy.rules:
+        for rule in self._policy.rules:
             if rule.effect != "allow" or not _rule_matches(rule, request, state, now):
                 continue
             if rule.rate_limit is not None:
@@ -365,8 +390,38 @@ class PolicyEngine:
                     return False, f"resource budget exceeded for policy rule {rule.rule_id}", rule.rule_id
             return True, f"allowed by policy rule {rule.rule_id}", rule.rule_id
 
-        allowed = self.policy.default == "allow"
-        return allowed, f"policy default {self.policy.default}", None
+        allowed = self._policy.default == "allow"
+        return allowed, f"policy default {self._policy.default}", None
+
+    def authorization_deadline(self, rule_id: str | None) -> int | None:
+        rule = next((rule for rule in self._policy.rules if rule.rule_id == rule_id), None)
+        return rule.expires_at if rule is not None else None
+
+    def revalidate_execution(
+        self, request: ActionRequest, state: RuntimeState, *, now: int, authorized_rule_id: str | None,
+    ) -> tuple[bool, str]:
+        """Recheck current restrictions without charging reserved budgets twice."""
+        if type(now) is not int or now < 0:
+            return False, "policy time must be a non-negative integer"
+        emergency = self._policy.emergency_stop
+        if emergency is not None and json_values_equal(state.values.get(emergency.state_key), emergency.equals):
+            if _action_key(request) not in emergency.allow_actions:
+                return False, "emergency-stop policy is active"
+        for rule in self._policy.rules:
+            if rule.effect in {"deny", "escalate"} and _rule_matches(rule, request, state, now):
+                return False, f"execution restricted by policy rule {rule.rule_id}"
+        # Reservations belong to the original first matching allow rule.
+        # A newly applicable earlier rule requires fresh authorization.
+        selected_rule = next((
+            rule for rule in self._policy.rules
+            if rule.effect == "allow" and _rule_matches(rule, request, state, now)
+        ), None)
+        selected_id = selected_rule.rule_id if selected_rule is not None else None
+        if selected_id != authorized_rule_id:
+            return False, "authorizing policy rule changed; fresh authorization required"
+        if selected_rule is None:
+            return self._policy.default == "allow", "current policy default"
+        return True, "authorizing policy rule remains applicable"
 
     def record_authorization(
         self,
@@ -381,7 +436,7 @@ class PolicyEngine:
         if rule_id is None:
             runtime.authorization_history.append((now, _action_key(request), request.subject, "default"))
             return
-        rule = next((candidate for candidate in self.policy.rules if candidate.rule_id == rule_id), None)
+        rule = next((candidate for candidate in self._policy.rules if candidate.rule_id == rule_id), None)
         if rule is None or rule.effect != "allow":
             return
         budget_total = None

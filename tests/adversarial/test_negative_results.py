@@ -8,5 +8,7 @@ def test_deliberate_negative_results_remain_visible():
     assert results["hardening_overfit"]["network_route_still_bypasses"]
     assert results["hardening_overfit"]["actuator_route_still_bypasses"]
     assert results["utility_tradeoff"]["aggressive_policy_blocks_benign_network_task"]
-    assert results["key_compromise"]["forged_guardian_signature_bypasses_hardened_policy"]
+    assert not results["key_compromise"]["forged_guardian_signature_bypasses_hardened_policy"]
+    assert results["key_compromise"]["original_secret_read_forgery_blocked"]
+    assert results["key_compromise"]["forged_signature_bypasses_capability_scope"]
     assert results["compromised_tool"]["undeclared_tool_side_effect_escapes_guardian_model"]

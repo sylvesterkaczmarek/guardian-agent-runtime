@@ -6,13 +6,13 @@ install:
 	python -m pip check
 
 test:
-	pytest
+	python -m pytest
 
 lint:
-	ruff check src tests experiments scripts formal
+	python -m ruff check src tests experiments scripts formal
 
 typecheck:
-	mypy src/guardian_runtime
+	python -m mypy src/guardian_runtime
 
 formal:
 	python formal/check_model.py

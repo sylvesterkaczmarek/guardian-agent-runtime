@@ -187,12 +187,12 @@
     }
   ],
   "lock_file": "requirements.lock",
-  "lock_sha256": "a4d07ebbb78dfec4563c9a836357f23db5352308c7a734569e64dc8c13e856e5",
+  "lock_sha256": "89b94a0573785d365395f0f5243862348b85712a61a9e85fcb1987d9a9c83d29",
   "packages": [
     {
       "name": "setuptools",
       "scope": "build-direct",
-      "version": "83.0.0"
+      "version": "84.1.0"
     },
     {
       "name": "wheel",
@@ -257,7 +257,7 @@
     {
       "name": "pillow",
       "scope": "transitive",
-      "version": "12.3.0"
+      "version": "13.0.0"
     },
     {
       "name": "pyparsing",

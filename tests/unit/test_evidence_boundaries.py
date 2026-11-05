@@ -105,11 +105,12 @@ def test_cyclic_tool_output_does_not_erase_execution_evidence(monkeypatch):
     cycle["self"] = cycle
     monkeypatch.setattr(runtime.environment, "execute", lambda _: ToolResult(True, "cyclic", cycle, 0))
     decision, result = runtime.execute_request(_request())
-    assert decision.allowed and result.ok
+    assert decision.allowed and not result.ok
+    assert result.status == "invalid-tool-result"
     assert runtime.gateway.execution_count == 1
     assert len(runtime.evidence.events) == 1
     assert runtime.evidence.events[0].result_digest == digest_json({
-        "ok": True, "status": "cyclic", "output": {"self": {"invalid_cycle": "builtins.dict"}},
+        "ok": False, "status": "invalid-tool-result", "output": {"error_type": "CanonicalizationError"},
         "state_version": 0,
     })
     assert verify_events(runtime.evidence.events, runtime.public_key)[0]
