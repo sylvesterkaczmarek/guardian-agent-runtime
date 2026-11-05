@@ -1,0 +1,150 @@
+name: Final public release check
+
+on:
+  push:
+    branches: [docs/guardian-release-status-20261105]
+    paths: [.github/workflows/final-public-check.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.14"
+      - name: Verify the already published GitHub assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/public-release"
+          gh release download v0.4.0 --repo "$GITHUB_REPOSITORY" \
+            --pattern '*.whl' --pattern '*.tar.gz' --pattern 'SHA256SUMS.txt' \
+            --pattern 'guardian-source.zip' --dir "$RUNNER_TEMP/public-release"
+          python - <<'PY'
+          import hashlib,json,os,urllib.request
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'public-release'
+          expected={
+              'guardian_agent_runtime-0.4.0-py3-none-any.whl':'b4372e2d4fce56c27e81fed676accd8eae9b0bc66719dfd6623d6a49cb90d860',
+              'guardian_agent_runtime-0.4.0.tar.gz':'117da14d12470d31c46cd20379f626c2220eab6db28b273777c230e3f287b9f0',
+              'guardian-source.zip':'394b85f928745c35dc28dc21d2d96a2909f59eb2334f59190648ef7b24da061c',
+          }
+          for name,digest in expected.items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest,name
+          for line in (root/'SHA256SUMS.txt').read_text().splitlines():
+              digest,name=line.split('  ',1)
+              assert expected[Path(name).name]==digest
+          with urllib.request.urlopen('https://pypi.org/pypi/guardian-agent-runtime/json',timeout=30) as response:
+              metadata=json.load(response)
+          (root/'public-state.json').write_text(json.dumps({
+              'github_version':'0.4.0','github_asset_hashes':expected,
+              'pypi_latest':metadata['info']['version'],
+              'pypi_has_0_4_0':'0.4.0' in metadata['releases'],
+              'github_released_commit':'44e2929864a5a80e4cdea796ab6e5d297811ab3a',
+          },indent=2)+'\n')
+          print('All three public GitHub asset hashes match the verified release.')
+          PY
+          python scripts/verify_distribution.py "$RUNNER_TEMP"/public-release/*.whl "$RUNNER_TEMP"/public-release/*.tar.gz --report "$RUNNER_TEMP/public-release/public-install.json" | tee "$RUNNER_TEMP/public-release/public-install.txt"
+      - name: Correct stale candidate wording and record the PyPI blocker
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('README.md');text=p.read_text()
+          old='## Review candidate\n\nThis branch prepares **0.4.0**, an unpublished reliability candidate.'
+          new='## Version 0.4.0\n\n**0.4.0 is released on GitHub** after independent verification.'
+          assert text.count(old)==1
+          text=text.replace(old,new)
+          text=text.replace('and [audit record](docs/implementation-2026-11-04.md) before upgrading.',
+                            'and [independent review](docs/independent-review-2026-11-05.md) before upgrading.')
+          marker='Run the offline demonstration after installing the checkout:'
+          note='The release passed 403 tests, including 58 separately authored review checks.\nThe [GitHub release](https://github.com/sylvesterkaczmarek/guardian-agent-runtime/releases/tag/v0.4.0)\ncontains the verified wheel, source distribution, source archive and checksums.\nPyPI publication is currently blocked by a missing matching trusted-publisher\nconfiguration. See [publication status](docs/publication-status.md).\n\n'
+          assert text.count(marker)==1
+          p.write_text(text.replace(marker,note+marker))
+          p=Path('docs/migration-0.4.md');text=p.read_text()
+          text=text.replace('# Migration to the 0.4 candidate','# Migration to version 0.4.0')
+          old='The candidate is version 0.4.0rc1 and remains unpublished. Independent review and\nrelease approval are separate steps.'
+          new='Version 0.4.0 completed independent verification and is released on GitHub.\nPyPI publication requires the trusted-publisher setup described in\n[publication status](publication-status.md).'
+          assert text.count(old)==1
+          p.write_text(text.replace(old,new))
+          Path('docs/publication-status.md').write_text('''# Publication status
+          
+          ## GitHub release
+          
+          Version 0.4.0 was published on 5 November 2026 from commit
+          44e2929864a5a80e4cdea796ab6e5d297811ab3a. PR #4 is merged.
+          The wheel and source distribution passed all 403 tests in an isolated
+          installation, including the 58 independent release checks. Their public
+          GitHub asset hashes are checked again by the final public release check.
+          
+          The release tag and uploaded assets are preserved without replacement.
+          Two stale candidate-status passages in the packaged documentation are
+          corrected in the current repository README and migration guide. They do
+          not change the released runtime code, formats, tests or package hashes.
+          
+          ## PyPI publication
+          
+          The publish job in Actions run 41943465213 was refused with
+          invalid-publisher: no corresponding trusted publisher matched the token.
+          No 0.4.0 upload succeeded in that run; public PyPI installation was skipped.
+          This is a publisher authorization requirement, not a failed runtime test.
+          
+          A project owner must configure a GitHub trusted publisher for the existing
+          guardian-agent-runtime PyPI project with these fields:
+          
+          | Field | Value |
+          | --- | --- |
+          | Owner | sylvesterkaczmarek |
+          | Repository | guardian-agent-runtime |
+          | Workflow filename | release.yml |
+          | Environment | pypi |
+          
+          After configuration, rerun the failed jobs in run 41943465213. This reuses
+          the original verified distributions, leaves the GitHub tag/assets alone
+          and runs the public PyPI hash and isolated-install verification. Do not
+          rerun the successful build job, which intentionally refuses an existing
+          version tag. Never place a PyPI password or API token in repository files.
+          
+          Official guidance is available at
+          https://docs.pypi.org/trusted-publishers/adding-a-publisher/
+          and https://docs.pypi.org/trusted-publishers/troubleshooting/.
+          
+          ## Evidence
+          
+          Independent preparation run: 41942655639.
+          Final PR verification run: 41943094507.
+          Release run: 41943465213.
+          The release assets include distribution.json, COMMIT.txt and SHA256SUMS.txt.
+          No production-agent, real-actuator or safety-certification claim is made.
+          ''')
+          PY
+          python -m pip install --no-deps -r requirements.lock
+          python -m pip install --no-deps --no-build-isolation -e .
+          python -m pytest tests/test_reproducibility.py
+      - name: Save documentation-only staging commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          git config user.name 'Sylvester Kaczmarek'
+          git config user.email '16242628+sylvesterkaczmarek@users.noreply.github.com'
+          git add README.md docs/migration-0.4.md docs/publication-status.md
+          git commit -m 'Clarify released version and exact PyPI publisher requirement'
+          git rev-parse HEAD > "$RUNNER_TEMP/public-release/DOCS_COMMIT.txt"
+          git push origin HEAD:refs/heads/docs/guardian-release-status-verified-20261105
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: public-github-release-verification
+          path: ${{ runner.temp }}/public-release/
+          if-no-files-found: error
+          retention-days: 90
