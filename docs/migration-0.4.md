@@ -1,10 +1,11 @@
-# Migration to the 0.4 candidate
+# Migration to version 0.4.0
 
 ## Stable formats
 
 ActionRequest, ExecutionPermit and the signed evidence-bundle format are unchanged.
-The candidate is version 0.4.0rc1 and remains unpublished. Independent review and
-release approval are separate steps.
+Version 0.4.0 completed independent verification and is released on GitHub.
+PyPI publication requires the trusted-publisher setup described in
+[publication status](publication-status.md).
 
 ## Owned authority
 
