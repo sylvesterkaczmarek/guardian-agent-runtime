@@ -1,57 +1,57 @@
 {
   "dependency_graph": [
     {
-      "from": "guardian-agent-runtime",
+      "from": "guardian-runtime-assurance",
       "scope": "build-direct",
       "to": "setuptools"
     },
     {
-      "from": "guardian-agent-runtime",
+      "from": "guardian-runtime-assurance",
       "scope": "build-direct",
       "to": "wheel"
     },
     {
-      "from": "guardian-agent-runtime",
+      "from": "guardian-runtime-assurance",
       "scope": "runtime-direct",
       "to": "cryptography"
     },
     {
-      "from": "guardian-agent-runtime",
+      "from": "guardian-runtime-assurance",
       "scope": "runtime-direct",
       "to": "PyYAML"
     },
     {
-      "from": "guardian-agent-runtime",
+      "from": "guardian-runtime-assurance",
       "scope": "runtime-direct",
       "to": "numpy"
     },
     {
-      "from": "guardian-agent-runtime",
+      "from": "guardian-runtime-assurance",
       "scope": "runtime-direct",
       "to": "matplotlib"
     },
     {
-      "from": "guardian-agent-runtime",
+      "from": "guardian-runtime-assurance",
       "scope": "development-direct",
       "to": "hypothesis"
     },
     {
-      "from": "guardian-agent-runtime",
+      "from": "guardian-runtime-assurance",
       "scope": "development-direct",
       "to": "mypy"
     },
     {
-      "from": "guardian-agent-runtime",
+      "from": "guardian-runtime-assurance",
       "scope": "development-direct",
       "to": "pytest"
     },
     {
-      "from": "guardian-agent-runtime",
+      "from": "guardian-runtime-assurance",
       "scope": "development-direct",
       "to": "pytest-cov"
     },
     {
-      "from": "guardian-agent-runtime",
+      "from": "guardian-runtime-assurance",
       "scope": "development-direct",
       "to": "ruff"
     },

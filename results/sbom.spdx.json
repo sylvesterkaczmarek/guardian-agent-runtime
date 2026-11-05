@@ -7,17 +7,17 @@
     ]
   },
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/sbom/0.4.0/reference-v3",
-  "name": "guardian-agent-runtime-reference-sbom",
+  "documentNamespace": "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/sbom/0.4.1/reference-v3",
+  "name": "guardian-runtime-assurance-reference-sbom",
   "packages": [
     {
-      "SPDXID": "SPDXRef-Package-guardian-agent-runtime",
+      "SPDXID": "SPDXRef-Package-guardian-runtime-assurance",
       "downloadLocation": "NOASSERTION",
       "filesAnalyzed": false,
       "licenseConcluded": "MIT",
-      "name": "guardian-agent-runtime",
+      "name": "guardian-runtime-assurance",
       "primaryPackagePurpose": "APPLICATION",
-      "versionInfo": "0.4.0"
+      "versionInfo": "0.4.1"
     },
     {
       "SPDXID": "SPDXRef-Package-setuptools",
@@ -332,62 +332,62 @@
   ],
   "relationships": [
     {
-      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relatedSpdxElement": "SPDXRef-Package-guardian-runtime-assurance",
       "relationshipType": "DESCRIBES",
       "spdxElementId": "SPDXRef-DOCUMENT"
     },
     {
-      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relatedSpdxElement": "SPDXRef-Package-guardian-runtime-assurance",
       "relationshipType": "BUILD_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Package-setuptools"
     },
     {
-      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relatedSpdxElement": "SPDXRef-Package-guardian-runtime-assurance",
       "relationshipType": "BUILD_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Package-wheel"
     },
     {
       "relatedSpdxElement": "SPDXRef-Package-cryptography",
       "relationshipType": "DEPENDS_ON",
-      "spdxElementId": "SPDXRef-Package-guardian-agent-runtime"
+      "spdxElementId": "SPDXRef-Package-guardian-runtime-assurance"
     },
     {
       "relatedSpdxElement": "SPDXRef-Package-PyYAML",
       "relationshipType": "DEPENDS_ON",
-      "spdxElementId": "SPDXRef-Package-guardian-agent-runtime"
+      "spdxElementId": "SPDXRef-Package-guardian-runtime-assurance"
     },
     {
       "relatedSpdxElement": "SPDXRef-Package-numpy",
       "relationshipType": "DEPENDS_ON",
-      "spdxElementId": "SPDXRef-Package-guardian-agent-runtime"
+      "spdxElementId": "SPDXRef-Package-guardian-runtime-assurance"
     },
     {
       "relatedSpdxElement": "SPDXRef-Package-matplotlib",
       "relationshipType": "DEPENDS_ON",
-      "spdxElementId": "SPDXRef-Package-guardian-agent-runtime"
+      "spdxElementId": "SPDXRef-Package-guardian-runtime-assurance"
     },
     {
-      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relatedSpdxElement": "SPDXRef-Package-guardian-runtime-assurance",
       "relationshipType": "DEV_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Package-hypothesis"
     },
     {
-      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relatedSpdxElement": "SPDXRef-Package-guardian-runtime-assurance",
       "relationshipType": "DEV_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Package-mypy"
     },
     {
-      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relatedSpdxElement": "SPDXRef-Package-guardian-runtime-assurance",
       "relationshipType": "DEV_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Package-pytest"
     },
     {
-      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relatedSpdxElement": "SPDXRef-Package-guardian-runtime-assurance",
       "relationshipType": "DEV_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Package-pytest-cov"
     },
     {
-      "relatedSpdxElement": "SPDXRef-Package-guardian-agent-runtime",
+      "relatedSpdxElement": "SPDXRef-Package-guardian-runtime-assurance",
       "relationshipType": "DEV_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Package-ruff"
     },

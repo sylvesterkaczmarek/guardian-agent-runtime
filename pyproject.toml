@@ -3,8 +3,8 @@ requires = ["setuptools>=84.1.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "guardian-agent-runtime"
-version = "0.4.0"
+name = "guardian-runtime-assurance"
+version = "0.4.1"
 description = "Reference monitor and adversarial benchmark for securing privileged actions by agentic systems."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -16,6 +16,11 @@ dependencies = [
   "numpy>=2,<3",
   "matplotlib>=3.10,<4",
 ]
+
+[project.urls]
+Repository = "https://github.com/sylvesterkaczmarek/guardian-agent-runtime"
+Issues = "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/issues"
+Changelog = "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [

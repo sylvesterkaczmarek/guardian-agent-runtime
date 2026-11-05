@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 from guardian_runtime.adversarial import generated_attack_scenarios
-from scripts.dependency_inventory import canonical_name, dependency_edges, parse_lock
+from scripts.dependency_inventory import PROJECT_NAME, canonical_name, dependency_edges, parse_lock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,7 +47,7 @@ def test_reference_dependency_graph_connects_every_transitive_package():
     inbound = {
         canonical_name(edge["to"])
         for edge in graph
-        if edge["from"] != "guardian-agent-runtime"
+        if edge["from"] != PROJECT_NAME
     }
     transitive = {
         canonical_name(item["name"])

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.1
+
+- Publish under `guardian-runtime-assurance`; the `guardian-agent-runtime` PyPI
+  project belongs to unrelated software and was never this repository's release.
+- Keep the repository, `guardian_runtime` import and verifier commands unchanged.
+- Validate wheel and sdist Name/Version metadata and the installed distribution.
+- Bind dependency inventory and SBOM package identity to pyproject metadata.
+- Select version-specific release notes and verify the correct public PyPI project.
+- Preserve the original 0.4.0 GitHub tag, packages and review evidence.
+- Runtime behaviour and benchmark scenarios are unchanged.
+
 ## 0.4.0
 
 A newly applicable first-match allow rule now invalidates an older permit and

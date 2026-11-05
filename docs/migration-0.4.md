@@ -1,11 +1,15 @@
-# Migration to version 0.4.0
+# Migration to the 0.4 series
 
 ## Stable formats
 
 ActionRequest, ExecutionPermit and the signed evidence-bundle format are unchanged.
-Version 0.4.0 completed independent verification and is released on GitHub.
-PyPI publication requires the trusted-publisher setup described in
-[publication status](publication-status.md).
+Version 0.4.0 remains available through its original GitHub release.
+The PyPI distribution from 0.4.1 is `guardian-runtime-assurance`.
+The `guardian-agent-runtime` name on PyPI is unrelated software; it is not an
+older release of this repository. The import `guardian_runtime` and both verifier
+commands are unchanged. Use a fresh virtual environment when switching from a
+locally installed 0.4.0 wheel so two distribution records cannot own the same files.
+See [publication status](publication-status.md) and [0.4.1 notes](release-0.4.1.md).
 
 ## Owned authority
 

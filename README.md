@@ -12,20 +12,31 @@ The central research question is:
 
 > How much security can an independent runtime reference monitor provide when the agent it supervises cannot itself be trusted?
 
-## Version 0.4.0
+## Version 0.4.1
 
-**0.4.0 is released on GitHub** after independent verification. It isolates
-loaded authority and signed evidence from mutable caller-owned objects, preserves
-JSON boolean types in constraints, rechecks time-sensitive policy at execution,
-and records malformed tool results as failed attempts. Existing action, permit
-and evidence formats remain unchanged. Review the [migration notes](docs/migration-0.4.md)
-and [independent review](docs/independent-review-2026-11-05.md) before upgrading.
+The PyPI distribution for this repository is **`guardian-runtime-assurance`**.
+The GitHub repository remains `sylvesterkaczmarek/guardian-agent-runtime`, the
+Python import remains `guardian_runtime`, and the verifier commands are unchanged.
+The similarly named `guardian-agent-runtime` on PyPI is an unrelated project.
+Do not install that distribution to obtain this code.
 
-The release passed 403 tests, including 58 separately authored review checks.
-The [GitHub release](https://github.com/sylvesterkaczmarek/guardian-agent-runtime/releases/tag/v0.4.0)
-contains the verified wheel, source distribution, source archive and checksums.
-PyPI publication is currently blocked by a missing matching trusted-publisher
-configuration. See [publication status](docs/publication-status.md).
+```bash
+python -m pip install guardian-runtime-assurance==0.4.1
+```
+
+Version 0.4.1 corrects package identity and publication metadata; its runtime
+behaviour is unchanged from the independently reviewed GitHub release 0.4.0.
+The earlier release's tag and assets remain intact. Review the
+[migration notes](docs/migration-0.4.md),
+[release notes](docs/release-0.4.1.md) and
+[publication status](docs/publication-status.md) for the distinction between
+GitHub release assets and verified PyPI availability.
+
+The runtime isolates loaded authority and signed evidence from mutable
+caller-owned objects, preserves JSON boolean types in constraints, rechecks
+time-sensitive policy before execution, and audits malformed tool results as
+failed attempts. All 403 existing tests, including 58 independent release
+checks, are retained; distribution identity has additional regression tests.
 
 Run the offline demonstration after installing the checkout:
 

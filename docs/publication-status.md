@@ -1,49 +1,45 @@
 # Publication status
 
-## GitHub release
+## Correct distribution
 
-Version 0.4.0 was published on 5 November 2026 from commit
-44e2929864a5a80e4cdea796ab6e5d297811ab3a. PR #4 is merged.
-The wheel and source distribution passed all 403 tests in an isolated
-installation, including the 58 independent release checks. Their public
-GitHub asset hashes are checked again by the final public release check.
+This repository's PyPI distribution is `guardian-runtime-assurance`.
+The GitHub repository remains `sylvesterkaczmarek/guardian-agent-runtime` and
+the Python import remains `guardian_runtime`. The existing PyPI distribution
+`guardian-agent-runtime` is unrelated QIP helper-backed software, not an older
+release of this repository. Its version 0.1.0 must not be used for this project.
 
-The release tag and uploaded assets are preserved without replacement.
-Two stale candidate-status passages in the packaged documentation are
-corrected in the current repository README and migration guide. They do
-not change the released runtime code, formats, tests or package hashes.
+The initial 0.4.0 upload failed with `invalid-publisher`. Authenticated inspection
+on 5 November 2026 confirmed that the existing PyPI project is not owned by this
+repository's maintainer; the earlier missing-publisher diagnosis was incomplete.
+No upload succeeded and no changes were made to that other project.
 
-## PyPI publication
+## Version 0.4.1 publication
 
-The publish job in Actions run 41943465213 was refused with
-invalid-publisher: no corresponding trusted publisher matched the token.
-No 0.4.0 upload succeeded in that run; public PyPI installation was skipped.
-This is a publisher authorization requirement, not a failed runtime test.
-
-A project owner must configure a GitHub trusted publisher for the existing
-guardian-agent-runtime PyPI project with these fields:
+A pending publisher is configured under the maintainer's account for the distinct
+distribution name. The release workflow creates that project on first successful
+publication and then verifies its public package hashes and isolated installation.
+Until those jobs succeed, this document records preparation rather than a claim
+that the version is already available on PyPI. The completed workflow and PyPI
+release page are the authoritative publication records.
 
 | Field | Value |
 | --- | --- |
-| Owner | sylvesterkaczmarek |
+| PyPI distribution | guardian-runtime-assurance |
+| GitHub owner | sylvesterkaczmarek |
 | Repository | guardian-agent-runtime |
 | Workflow filename | release.yml |
 | Environment | pypi |
 
-After configuration, rerun the failed jobs in run 41943465213. This reuses
-the original verified distributions, leaves the GitHub tag/assets alone
-and runs the public PyPI hash and isolated-install verification. Do not
-rerun the successful build job, which intentionally refuses an existing
-version tag. Never place a PyPI password or API token in repository files.
+No API token or password is stored in this repository. The workflow uses PyPI
+trusted publishing. No further attempt should target the unrelated old name.
 
-Official guidance is available at
-https://docs.pypi.org/trusted-publishers/adding-a-publisher/
-and https://docs.pypi.org/trusted-publishers/troubleshooting/.
+## Preserved earlier release
 
-## Evidence
+GitHub version 0.4.0 remains at commit
+44e2929864a5a80e4cdea796ab6e5d297811ab3a with its original tags, assets and hashes.
+The original review, 403 tests and published-GitHub download verification remain
+valid for that software. Version 0.4.1 is a distribution-identity correction;
+it does not replace or rewrite those existing assets.
 
-Independent preparation run: 41942655639.
-Final PR verification run: 41943094507.
-Release run: 41943465213.
-The release assets include distribution.json, COMMIT.txt and SHA256SUMS.txt.
-No production-agent, real-actuator or safety-certification claim is made.
+The runtime remains a same-process research implementation using deterministic
+simulators and benchmark-only keys, not a production-safety certification.

@@ -20,11 +20,12 @@ def main() -> int:
     graph = dependency_edges(locked)
     project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]
     project_version = str(project["version"])
-    project_id = _spdx_id("guardian-agent-runtime")
+    project_name = str(project["name"])
+    project_id = _spdx_id(project_name)
     packages = [
         {
             "SPDXID": project_id,
-            "name": "guardian-agent-runtime",
+            "name": project_name,
             "versionInfo": project_version,
             "downloadLocation": "NOASSERTION",
             "filesAnalyzed": False,
@@ -32,7 +33,7 @@ def main() -> int:
             "primaryPackagePurpose": "APPLICATION",
         }
     ]
-    ids = {"guardian-agent-runtime": project_id}
+    ids = {project_name: project_id}
     for item in locked:
         spdx_id = _spdx_id(item["name"])
         ids[item["name"]] = spdx_id
@@ -88,7 +89,7 @@ def main() -> int:
         "spdxVersion": "SPDX-2.3",
         "dataLicense": "CC0-1.0",
         "SPDXID": "SPDXRef-DOCUMENT",
-        "name": "guardian-agent-runtime-reference-sbom",
+        "name": f"{project_name}-reference-sbom",
         "documentNamespace": (
             "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/"
             f"sbom/{project_version}/reference-v3"

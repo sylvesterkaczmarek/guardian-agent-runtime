@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+from email.parser import BytesParser
+import re
 import hashlib
 import json
 import os
@@ -13,6 +15,20 @@ import tempfile
 import tomllib
 import venv
 import zipfile
+
+
+def validate_distribution_metadata(raw: bytes, *, name: str, version: str) -> None:
+    """Reject mismatched or ambiguous distribution identities before installing."""
+    metadata = BytesParser().parsebytes(raw)
+    names, versions = metadata.get_all("Name", []), metadata.get_all("Version", [])
+    if len(names) != 1 or len(versions) != 1:
+        raise ValueError("distribution must have exactly one Name and Version")
+
+    def canonical(value: str) -> str:
+        return re.sub(r"[-_.]+", "-", value).lower()
+
+    if canonical(names[0]) != canonical(name) or versions[0] != version:
+        raise ValueError("distribution identity differs from pyproject.toml")
 
 
 def main() -> int:
@@ -37,9 +53,15 @@ def main() -> int:
         if len(roots) != 1 or not roots[0].is_dir():
             raise ValueError("sdist must contain exactly one project directory")
         project = roots[0]
-        version = tomllib.loads((project / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+        project_metadata = tomllib.loads((project / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+        name, version = project_metadata["name"], project_metadata["version"]
+        validate_distribution_metadata((project / "PKG-INFO").read_bytes(), name=name, version=version)
         package = project / "src" / "guardian_runtime"
         with zipfile.ZipFile(wheel) as archive:
+            metadata_files = [item for item in archive.namelist() if item.endswith(".dist-info/METADATA")]
+            if len(metadata_files) != 1:
+                raise ValueError("wheel must contain exactly one distribution metadata record")
+            validate_distribution_metadata(archive.read(metadata_files[0]), name=name, version=version)
             source_files = {
                 "guardian_runtime/" + path.relative_to(package).as_posix(): path.read_bytes()
                 for path in package.rglob("*")
@@ -65,8 +87,9 @@ def main() -> int:
         run(
             [
                 "-c",
-                "import guardian_runtime,pathlib,sys; p=pathlib.Path(guardian_runtime.__file__).resolve(); assert pathlib.Path(sys.prefix).resolve() in p.parents; assert guardian_runtime.__version__ == sys.argv[1]; print('Installed runtime:',p)",
+                "import guardian_runtime,pathlib,sys,importlib.metadata; assert importlib.metadata.version(sys.argv[2]) == sys.argv[1]; p=pathlib.Path(guardian_runtime.__file__).resolve(); assert pathlib.Path(sys.prefix).resolve() in p.parents; assert guardian_runtime.__version__ == sys.argv[1]; print('Installed runtime:',p)",
                 version,
+                name,
             ]
         )
         run(["-m", "pytest"])
@@ -76,6 +99,7 @@ def main() -> int:
         public_key = (proof / "public-key.txt").read_text(encoding="utf-8").strip()
         run(["-m", "guardian_runtime.verifier.cli", str(proof / "evidence.json"), "--public-key", public_key])
         payload = {
+            "distribution": name,
             "version": version,
             "status": "PASS",
             "runtime_files_matched": len(source_files),
