@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0
+
+A newly applicable first-match allow rule now invalidates an older permit and
+requires fresh authorization. The 58-case independent suite covers timing,
+budgets, replay, evidence, malformed results and input validation. All prior
+0.4 candidate corrections are retained.
+
+
 ## 0.4.0rc1
 
 Unpublished review candidate prepared in November 2026.

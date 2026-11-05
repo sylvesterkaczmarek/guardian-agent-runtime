@@ -410,11 +410,17 @@ class PolicyEngine:
         for rule in self._policy.rules:
             if rule.effect in {"deny", "escalate"} and _rule_matches(rule, request, state, now):
                 return False, f"execution restricted by policy rule {rule.rule_id}"
-        if authorized_rule_id is None:
+        # Reservations belong to the original first matching allow rule.
+        # A newly applicable earlier rule requires fresh authorization.
+        selected_rule = next((
+            rule for rule in self._policy.rules
+            if rule.effect == "allow" and _rule_matches(rule, request, state, now)
+        ), None)
+        selected_id = selected_rule.rule_id if selected_rule is not None else None
+        if selected_id != authorized_rule_id:
+            return False, "authorizing policy rule changed; fresh authorization required"
+        if selected_rule is None:
             return self._policy.default == "allow", "current policy default"
-        selected_rule = next((rule for rule in self._policy.rules if rule.rule_id == authorized_rule_id), None)
-        if selected_rule is None or selected_rule.effect != "allow" or not _rule_matches(selected_rule, request, state, now):
-            return False, "authorizing policy rule no longer applies"
         return True, "authorizing policy rule remains applicable"
 
     def record_authorization(

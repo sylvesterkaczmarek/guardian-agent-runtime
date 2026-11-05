@@ -53,3 +53,10 @@ Both CLI verifiers reject files over 32 MiB as input errors. JSON nesting is che
 before decoding and limited to 128 levels, as before. Larger evidence collections
 need separately bounded bundles and external ordering/freshness management. The
 checker does not silently split or truncate evidence.
+
+## Changed first-match policy rules
+
+A permit becomes invalid when a different allow rule becomes the first applicable
+rule before execution. Obtain fresh authorization with a new nonce. This includes
+explicit rules replacing default-allow decisions. The old reservation is not
+refunded, and valid reservations are not charged twice.

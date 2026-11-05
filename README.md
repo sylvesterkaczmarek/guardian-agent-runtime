@@ -14,7 +14,7 @@ The central research question is:
 
 ## Review candidate
 
-This branch prepares **0.4.0rc1**, an unpublished reliability candidate. It isolates
+This branch prepares **0.4.0**, an unpublished reliability candidate. It isolates
 loaded authority and signed evidence from mutable caller-owned objects, preserves
 JSON boolean types in constraints, rechecks time-sensitive policy at execution,
 and records malformed tool results as failed attempts. Existing action, permit
@@ -457,3 +457,11 @@ If you use or adapt this repository, please cite:
 MIT. See [LICENSE](LICENSE).
 
 © **Sylvester Kaczmarek** · [https://www.sylvesterkaczmarek.com](https://www.sylvesterkaczmarek.com)
+
+## November verified release
+
+Version 0.4.0 includes independent temporal-rule regression checks. See
+[the release notes](docs/release-0.4.0.md) and
+[the independent review](docs/independent-review-2026-11-05.md).
+GitHub release artifacts and PyPI publication have separate verification jobs;
+check their actual workflow status before assuming package-index availability.

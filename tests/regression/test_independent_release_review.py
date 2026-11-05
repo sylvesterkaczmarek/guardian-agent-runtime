@@ -26,7 +26,15 @@ KEY = Ed25519PrivateKey.generate()
 
 def request(**changes):
     return replace(
-        ActionRequest("reviewer", "isolated", "sandbox", "read_file", resource="/tmp/input.txt", capability_id="root", nonce="once"),
+        ActionRequest(
+            "reviewer",
+            "isolated",
+            "sandbox",
+            "read_file",
+            resource="/tmp/input.txt",
+            capability_id="root",
+            nonce="once",
+        ),
         **changes,
     )
 
@@ -34,9 +42,9 @@ def request(**changes):
 def runtime(rules=(), default="allow", environment=None, emergency=None):
     clock = [100]
     monitor = GuardianRuntime(
-        capabilities=CapabilityStore([
-            Capability("root", "reviewer", "sandbox", "*", constraints={"cost": {}, "value": {}, "content": {}})
-        ]),
+        capabilities=CapabilityStore(
+            [Capability("root", "reviewer", "sandbox", "*", constraints={"cost": {}, "value": {}, "content": {}})]
+        ),
         policy=PolicyEngine(Policy("review-v1", default, tuple(rules), emergency)),
         environment=environment or SandboxEnvironment(),
         signing_key=KEY,
@@ -50,7 +58,8 @@ def runtime(rules=(), default="allow", environment=None, emergency=None):
 def valid_bundle(monitor):
     bundle = monitor.evidence.export_bundle(policy_version=monitor.policy.version)
     assert verify_evidence_bundle(
-        bundle, monitor.public_key,
+        bundle,
+        monitor.public_key,
         expected_policy_version=monitor.policy.version,
         expected_manifest_hash=monitor.runtime_manifest_hash,
     )[0]
@@ -62,7 +71,8 @@ def valid_bundle(monitor):
 def test_new_first_matching_allow_rule_requires_new_reservation(fallback, restriction):
     constraints = (
         {"resource_budget": ResourceBudget("restricted", "cost", 0)}
-        if restriction == "budget" else {"rate_limit": RateLimit(1, 60)}
+        if restriction == "budget"
+        else {"rate_limit": RateLimit(1, 60)}
     )
     stricter = PolicyRule("later-restriction", "allow", not_before=101, **constraints)
     rules = [stricter] + ([PolicyRule("fallback", "allow")] if fallback == "rule" else [])
@@ -123,10 +133,18 @@ def test_restriction_after_issuance_is_enforced(kind):
     assert monitor.gateway.execution_count == 0
 
 
-@pytest.mark.parametrize("field,value", [
-    ("resource", "/etc/forbidden"), ("subject", "other"), ("session_id", "other"),
-    ("action", "secret_read"), ("nonce", "replacement"), ("params", {"value": 1}), ("context", {"x": 1}),
-])
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("resource", "/etc/forbidden"),
+        ("subject", "other"),
+        ("session_id", "other"),
+        ("action", "secret_read"),
+        ("nonce", "replacement"),
+        ("params", {"value": 1}),
+        ("context", {"x": 1}),
+    ],
+)
 def test_permit_cannot_authorize_substituted_request(field, value):
     monitor, _ = runtime()
     decision = monitor.evaluate(request())
@@ -155,7 +173,9 @@ def test_parallel_permit_replay_has_one_effect_and_record():
 
 
 def test_reservations_are_not_charged_again_at_execution():
-    rule = PolicyRule("allow", "allow", rate_limit=RateLimit(2, 30), resource_budget=ResourceBudget("budget", "cost", 0.3))
+    rule = PolicyRule(
+        "allow", "allow", rate_limit=RateLimit(2, 30), resource_budget=ResourceBudget("budget", "cost", 0.3)
+    )
     monitor, _ = runtime(rules=[rule], default="deny")
     for index, cost in enumerate((0.1, 0.2)):
         decision, result = monitor.execute_request(request(params={"cost": cost}, nonce=str(index)))
@@ -166,14 +186,22 @@ def test_reservations_are_not_charged_again_at_execution():
     valid_bundle(monitor)
 
 
-@pytest.mark.parametrize("object_type", ["capability-input", "capability-get", "capability-clone", "policy-input", "policy-get"])
+@pytest.mark.parametrize(
+    "object_type", ["capability-input", "capability-get", "capability-clone", "policy-input", "policy-get"]
+)
 def test_nested_authority_copies_cannot_widen_values(object_type):
     proposed = request(params={"value": {"nested": [99]}})
     if object_type.startswith("capability"):
         values = {"value": {"enum": [{"nested": [1]}]}}
         store = CapabilityStore([Capability("root", "reviewer", "sandbox", "read_file", constraints=values)])
-        exposed = values if object_type == "capability-input" else (
-            store.get("root").constraints if object_type == "capability-get" else store.clone().get("root").constraints
+        exposed = (
+            values
+            if object_type == "capability-input"
+            else (
+                store.get("root").constraints
+                if object_type == "capability-get"
+                else store.clone().get("root").constraints
+            )
         )
         exposed["value"]["enum"][0]["nested"][0] = 99
         assert not store.validate(proposed, 100, consume=False)[0]
@@ -187,8 +215,12 @@ def test_nested_authority_copies_cannot_widen_values(object_type):
 
 @pytest.mark.parametrize("boolean,number", [(True, 1), (False, 0), ([True], [1]), ({"x": [False]}, {"x": [0]})])
 def test_boolean_enum_and_delegation_cannot_gain_numeric_authority(boolean, number):
-    parent = Capability("root", "reviewer", "sandbox", "read_file", constraints={"value": {"enum": [number]}}, delegation_depth=1)
-    child = replace(parent, capability_id="child", parent_id="root", delegation_depth=0, constraints={"value": {"enum": [boolean]}})
+    parent = Capability(
+        "root", "reviewer", "sandbox", "read_file", constraints={"value": {"enum": [number]}}, delegation_depth=1
+    )
+    child = replace(
+        parent, capability_id="child", parent_id="root", delegation_depth=0, constraints={"value": {"enum": [boolean]}}
+    )
     assert not capability_is_subset(child, parent)
     store = CapabilityStore([parent])
     assert not store.validate(request(params={"value": boolean}), 100, consume=False)[0]
@@ -236,10 +268,17 @@ def test_evidence_snapshot_and_signed_manifest_are_detached():
     assert verify_manifest(signed, KEY.public_key())
 
 
-@pytest.mark.parametrize("bad", [
-    None, {"ok": True}, ToolResult(1, "success"), ToolResult(True, "\ud800"),
-    ToolResult(True, "x", {"nested": [float("nan")]}), ToolResult(True, "x", state_version=-1),
-])
+@pytest.mark.parametrize(
+    "bad",
+    [
+        None,
+        {"ok": True},
+        ToolResult(1, "success"),
+        ToolResult(True, "\ud800"),
+        ToolResult(True, "x", {"nested": [float("nan")]}),
+        ToolResult(True, "x", state_version=-1),
+    ],
+)
 def test_bad_result_preserves_attempt_without_retry(bad):
     class Partial(SandboxEnvironment):
         def execute(self, proposed):
@@ -256,10 +295,16 @@ def test_bad_result_preserves_attempt_without_retry(bad):
         monitor.gateway.execute(decision.normalized_request, decision.permit)
 
 
-@pytest.mark.parametrize("name,value", [
-    ("nonce", ""), ("tool", "Sandbox"), ("params", {"x": float("inf")}),
-    ("context", {"x": "\udfff"}), ("observed_state_version", True),
-])
+@pytest.mark.parametrize(
+    "name,value",
+    [
+        ("nonce", ""),
+        ("tool", "Sandbox"),
+        ("params", {"x": float("inf")}),
+        ("context", {"x": "\udfff"}),
+        ("observed_state_version", True),
+    ],
+)
 def test_malformed_request_denial_does_not_consume_authority(name, value):
     monitor, _ = runtime()
     decision, result = monitor.execute_request(request(**{name: value}))
@@ -269,12 +314,14 @@ def test_malformed_request_denial_does_not_consume_authority(name, value):
 
 
 @pytest.mark.parametrize("module", ["guardian_runtime.verifier.cli", "guardian_runtime.verifier.manifest_cli"])
-@pytest.mark.parametrize("payload", ['{"x":1,"x":2}', '[1e999]', '[' * 129 + ']' * 129, '{"x":"\\ud800"}'])
+@pytest.mark.parametrize("payload", ['{"x":1,"x":2}', "[1e999]", "[" * 129 + "]" * 129, '{"x":"\\ud800"}'])
 def test_malformed_cli_input_has_nonzero_status_without_traceback(tmp_path, module, payload):
     path = tmp_path / "bad.json"
     path.write_text(payload, encoding="utf-8")
     result = subprocess.run(
         [sys.executable, "-m", module, str(path), "--public-key", public_key_b64(KEY.public_key())],
-        capture_output=True, text=True, timeout=10,
+        capture_output=True,
+        text=True,
+        timeout=10,
     )
     assert result.returncode in (1, 2) and "Traceback" not in result.stderr
