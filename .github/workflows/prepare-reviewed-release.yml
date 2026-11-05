@@ -1,0 +1,200 @@
+name: Prepare reviewed release
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/prepare-reviewed-release.yml
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    if: github.event.pull_request.number == 4 && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/runtime-integrity-20261104'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.14"
+      - name: Install exact review environment
+        run: |
+          python -m pip install --no-deps -r requirements.lock
+          python -m pip install --no-deps --no-build-isolation -e .
+          python -m pip check
+          mkdir -p "$RUNNER_TEMP/guardian-proof"
+      - name: Reproduce the four independent failures before repair
+        shell: bash
+        run: |
+          set +e
+          python -m pytest tests/regression/test_independent_release_review.py --junitxml="$RUNNER_TEMP/guardian-proof/before.xml" > "$RUNNER_TEMP/guardian-proof/before.txt" 2>&1
+          result=$?
+          set -e
+          test "$result" -eq 1
+          python - <<'PY'
+          import os,xml.etree.ElementTree as ET
+          from pathlib import Path
+          suites=ET.parse(Path(os.environ['RUNNER_TEMP'])/'guardian-proof/before.xml').getroot()
+          cases=list(suites.iter('testcase'))
+          failures=[c for c in cases if c.find('failure') is not None]
+          assert len(cases)==58 and len(failures)==4
+          assert all(c.attrib['name'].startswith('test_new_first_matching_allow_rule_requires_new_reservation') for c in failures)
+          assert not list(suites.iter('error'))
+          print('Independent baseline: 54 passed, four expected timing failures reproduced.')
+          PY
+      - name: Apply reviewed correction and final release metadata
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/guardian_runtime/policy/engine.py')
+          text=p.read_text()
+          old='''        if authorized_rule_id is None:
+                      return self._policy.default == "allow", "current policy default"
+                  selected_rule = next((rule for rule in self._policy.rules if rule.rule_id == authorized_rule_id), None)
+                  if selected_rule is None or selected_rule.effect != "allow" or not _rule_matches(selected_rule, request, state, now):
+                      return False, "authorizing policy rule no longer applies"
+                  return True, "authorizing policy rule remains applicable"
+          '''
+          # The workflow indentation is not part of the Python source being replaced.
+          old=old.replace('\n          ', '\n')
+          new='''        # The initial decision reserves the first matching allow rule's budgets.
+                  # A later temporal rule can require different reservations. Reauthorize
+                  # when selection changes instead of reusing the old rule's permit.
+                  selected_rule = next((
+                      rule for rule in self._policy.rules
+                      if rule.effect == "allow" and _rule_matches(rule, request, state, now)
+                  ), None)
+                  selected_id = selected_rule.rule_id if selected_rule is not None else None
+                  if selected_id != authorized_rule_id:
+                      return False, "authorizing policy rule changed; fresh authorization required"
+                  if selected_rule is None:
+                      return self._policy.default == "allow", "current policy default"
+                  return True, "authorizing policy rule remains applicable"
+          '''
+          new=new.replace('\n          ', '\n')
+          assert text.count(old)==1, 'Expected candidate code does not match'
+          p.write_text(text.replace(old,new))
+          for name in ('pyproject.toml','src/guardian_runtime/__init__.py','CITATION.cff'):
+              p=Path(name);text=p.read_text();assert '0.4.0rc1' in text
+              p.write_text(text.replace('0.4.0rc1','0.4.0'))
+          p=Path('README.md');text=p.read_text().replace('0.4.0rc1','0.4.0')
+          text += '\n## November verified release\n\nVersion 0.4.0 includes independent temporal-rule regression checks. See\n[the release notes](docs/release-0.4.0.md) and\n[the independent review](docs/independent-review-2026-11-05.md).\nGitHub release artifacts and PyPI publication have separate verification jobs;\ncheck their actual workflow status before assuming package-index availability.\n'
+          p.write_text(text)
+          p=Path('CHANGELOG.md');text=p.read_text();first,rest=text.split('\n',1)
+          p.write_text(first+'\n\n## 0.4.0\n\nReleased after independent verification. A newly applicable first-match allow\nrule now invalidates an older permit and requires fresh authorization. The\n58-case independent suite covers timing, budgets, replay, evidence, malformed\nresults and input validation. Existing 0.4 candidate corrections are retained.\n\n'+rest)
+          Path('docs/release-0.4.0.md').write_text('''# Guardian Agent Runtime 0.4.0
+          
+          This release strengthens runtime permission checks, audit ownership and
+          malformed-result handling. It includes the 0.4 candidate changes and the
+          independent-review correction for newly active first-match policy rules.
+          
+          ## Independent correction
+          
+          An existing permit could execute after a newly applicable earlier allow rule
+          imposed a budget or rate limit that a fresh request would fail. Execution now
+          checks that the selected allow rule is the same rule that reserved authority.
+          A changed selection requires fresh authorization. Unrelated rules do not
+          invalidate a permit, and reserved budgets are not charged twice.
+          
+          ## Verification
+          
+          Release gates run all tests, Ruff, mypy, the bounded Python model, TLA+,
+          the vulnerability audit, exact reference regeneration and isolated package
+          verification. The 58 independent cases initially produced four failures;
+          all must pass after correction. Both positive and negative controls remain.
+          The reference benchmark still uses 26 fixed attacks, 24 seeded attacks per
+          seed, five seeds and 11 benign tasks. These denominators were not enlarged
+          with unit tests.
+          
+          ## Distribution status
+          
+          GitHub release assets are built and verified from the released commit.
+          PyPI publication and public-install verification are separate workflow jobs.
+          The presence of a GitHub release alone does not imply PyPI publication.
+          
+          ## Limits
+          
+          This is a same-process reference implementation using deterministic local
+          simulators and benchmark-only keys. It does not establish production
+          isolation, protected keys, crash durability, restart-safe replay protection,
+          hardware qualification or safety against unseen attacks. The original
+          compromised-key secret-read forgery is blocked, while a separate forged
+          policy-allowed write still demonstrates the signing-key trust limitation.
+          No paid inference, live agent account or real actuator was used.
+          '''.replace('\n          ','\n'))
+          Path('docs/independent-review-2026-11-05.md').write_text('''# Independent release review
+          
+          Original candidate: 2ceecc2d427df591238b073340bb3f74e7a300af.
+          Date: 5 November 2026.
+          
+          A fresh macOS checkout and pinned environment reproduced all 345 candidate
+          tests. A separately authored 58-case suite produced 54 passes and four
+          failures before any runtime repair. The failures affect both default-allow
+          and explicit fallback policies when a newly active earlier allow rule adds
+          a resource budget or rate limit. Fresh authorization rejects these requests
+          but the old candidate permit incorrectly executes them.
+          
+          The repair requires equality between the currently selected first matching
+          allow rule and the originally authorized rule. A changed selection rejects
+          the permit without executing the tool or consuming an additional reservation.
+          Unrelated rules, boundary-valid permits and exact decimal budgets remain
+          positive controls. The original failing reproductions are retained in review
+          artifacts. The regression suite is in
+          tests/regression/test_independent_release_review.py.
+          
+          After the Mac remote-execution quota was exhausted, verification continued
+          on isolated GitHub-hosted runners. The preparation run requires all 58
+          independent checks, the full 403-test suite, lint, type checks, bounded
+          model, two identical reference generations and installed-wheel tests before
+          it creates a staging commit. The pull request and release pipelines then
+          repeat full verification on the exact committed source. Hosted run results,
+          distribution hashes and publication status are separate inspectable records.
+          
+          This review is independent of the implementation test design, but is not
+          an external third-party security certification. Scope remains the documented
+          same-process simulator and trusted-tool model. Signing-key compromise,
+          concealed tool effects, restart durability and production isolation remain
+          explicit limits. Publication is permitted only after all required gates pass.
+          '''.replace('\n          ','\n'))
+          p=Path('docs/migration-0.4.md')
+          p.write_text(p.read_text()+'\n## Changed first-match policy rules\n\nA permit becomes invalid when a different allow rule becomes the first applicable\nrule before execution. Obtain fresh authorization with a new nonce. This also\napplies when an explicit rule replaces a default-allow decision. The old\nreservation is not refunded, and valid reservations are not charged twice.\n')
+          PY
+          python -m ruff format tests/regression/test_independent_release_review.py
+      - name: Run independent and complete verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/regression/test_independent_release_review.py --junitxml="$RUNNER_TEMP/guardian-proof/after.xml" | tee "$RUNNER_TEMP/guardian-proof/after.txt"
+          make reproduce > "$RUNNER_TEMP/guardian-proof/reproduce.txt" 2>&1
+          make verify-reproduce > "$RUNNER_TEMP/guardian-proof/reproduce-repeat.txt" 2>&1
+          make check | tee "$RUNNER_TEMP/guardian-proof/check.txt"
+          python scripts/showcase.py --output "$RUNNER_TEMP/guardian-proof/showcase"
+          python -m pip wheel . --no-deps --no-build-isolation -w dist
+          python -c 'from setuptools.build_meta import build_sdist; build_sdist("dist")'
+          python scripts/verify_distribution.py dist/*.whl dist/*.tar.gz --report "$RUNNER_TEMP/guardian-proof/distribution.json" | tee "$RUNNER_TEMP/guardian-proof/installed.txt"
+      - name: Save verified staging commit without merging
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse origin/main)" = '0a526d019c4a8e75db5f98b8d8b7021a8cc5410d'
+          git diff --check
+          git config user.name 'Sylvester Kaczmarek'
+          git config user.email '16242628+sylvesterkaczmarek@users.noreply.github.com'
+          git add src/guardian_runtime/policy/engine.py src/guardian_runtime/__init__.py pyproject.toml CITATION.cff README.md CHANGELOG.md docs tests/regression/test_independent_release_review.py results
+          git commit -m 'Close temporal rule selection gap and finalize independently verified 0.4.0'
+          git rev-parse HEAD | tee "$RUNNER_TEMP/guardian-proof/COMMIT.txt"
+          git archive --format=zip --output="$RUNNER_TEMP/guardian-proof/source.zip" HEAD
+          cp dist/* "$RUNNER_TEMP/guardian-proof/"
+          git push origin HEAD:refs/heads/review/guardian-0.4.0-verified-20261105
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: independent-review-proof
+          path: ${{ runner.temp }}/guardian-proof/
+          if-no-files-found: error
+          retention-days: 90
