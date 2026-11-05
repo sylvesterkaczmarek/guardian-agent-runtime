@@ -14,6 +14,9 @@ The central research question is:
 
 ## Version 0.4.1
 
+**0.4.1 is published on GitHub and PyPI.** All 413 tests passed, including a fresh
+installation of the public package, and its hashes match the verified release.
+
 The PyPI distribution for this repository is **`guardian-runtime-assurance`**.
 The GitHub repository remains `sylvesterkaczmarek/guardian-agent-runtime`, the
 Python import remains `guardian_runtime`, and the verifier commands are unchanged.

@@ -1,4 +1,4 @@
-# Candidate verification
+# Release verification
 
 ## Source checkout
 
@@ -41,8 +41,9 @@ macOS checks run on Python 3.14. Do not claim local execution of other environme
 or Windows qualification from these jobs. The dependency audit remains a required
 job. The formal checks are bounded model results, not a proof of the implementation.
 
-Prompt 1 prepares a draft pull request only. Merge, final version, release and public
-installation verification remain Prompt 2 decisions. No release schedule is created.
+Merge only after the exact reviewed head passes the required checks. The release
+workflow repeats those checks before building and publishing. Confirm public package
+hashes and an isolated installed-package run before recording publication as complete.
 
 ## Figure portability
 
