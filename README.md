@@ -12,14 +12,20 @@ The central research question is:
 
 > How much security can an independent runtime reference monitor provide when the agent it supervises cannot itself be trusted?
 
-## Review candidate
+## Version 0.4.0
 
-This branch prepares **0.4.0**, an unpublished reliability candidate. It isolates
+**0.4.0 is released on GitHub** after independent verification. It isolates
 loaded authority and signed evidence from mutable caller-owned objects, preserves
 JSON boolean types in constraints, rechecks time-sensitive policy at execution,
 and records malformed tool results as failed attempts. Existing action, permit
 and evidence formats remain unchanged. Review the [migration notes](docs/migration-0.4.md)
-and [audit record](docs/implementation-2026-11-04.md) before upgrading.
+and [independent review](docs/independent-review-2026-11-05.md) before upgrading.
+
+The release passed 403 tests, including 58 separately authored review checks.
+The [GitHub release](https://github.com/sylvesterkaczmarek/guardian-agent-runtime/releases/tag/v0.4.0)
+contains the verified wheel, source distribution, source archive and checksums.
+PyPI publication is currently blocked by a missing matching trusted-publisher
+configuration. See [publication status](docs/publication-status.md).
 
 Run the offline demonstration after installing the checkout:
 
