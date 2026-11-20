@@ -97,7 +97,10 @@ def main() -> int:
         run(["scripts/showcase.py", "--output", str(root / "showcase")])
         study = root / "observation-study"
         run(["-m", "guardian_runtime.study.cli", "--output", str(study)])
-        report = json.loads((study / "report.json").read_text(encoding="utf-8"))
+        report_bytes = (study / "report.json").read_bytes()
+        if report_bytes != (project / "results/observation_pilot.json").read_bytes():
+            raise ValueError("installed pilot report differs from the published reference")
+        report = json.loads(report_bytes)
         if len(report["rows"]) != 42 or not all(r["truth_agrees_across_executions"] for r in report["rows"]):
             raise ValueError("installed pilot failed its paired controls")
         proof = root / "showcase"

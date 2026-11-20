@@ -23,7 +23,8 @@ def main() -> int:
     with tempfile.TemporaryDirectory(dir=args.output.parent) as scratch:
         staging = Path(scratch) / "pilot"
         staging.mkdir()
-        (staging / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        (staging / "report.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n",
+                                             encoding="utf-8", newline="\n")
         for family, sample in samples.items():
             out = staging / family
             out.mkdir()
