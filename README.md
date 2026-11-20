@@ -6,46 +6,38 @@
 ![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-A reference monitor and adversarial benchmark for testing whether authorization and hard safety constraints remain enforceable when an agentic system is compromised, manipulated, adversarial, or wrong.
+Guardian checks an agent's proposed tool call against its permissions, runtime policy and current system state before dispatch. It signs a record linking the decision to the tool result and any observations of what actually changed.
 
-The central research question is:
+A file worker can acknowledge a write and leave the file untouched. It can also commit the write and then report an error. The offline pilot reproduces both cases and lets you inspect the evidence for each outcome.
 
-> How much security can an independent runtime reference monitor provide when the agent it supervises cannot itself be trusted?
+## Run the observed-outcomes pilot
 
-## Development version and observed outcomes
+From a shell with Git and Python 3.12 or later installed, run the following on macOS or Linux. The pilot runs locally without a model account.
 
-Install this checkout with `python -m pip install .` and run `guardian-study --output pilot`. The offline study compares tool acknowledgements with independently observed effects in a file worker and a simulated joint. An acknowledged write that did nothing fails the completion check. A committed write followed by a tool error retains both facts.
+```bash
+git clone https://github.com/sylvesterkaczmarek/guardian-agent-runtime.git
+cd guardian-agent-runtime
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install .
+guardian-study --output pilot
+```
 
-Guardian and a simple checker with the same observations tied on the pilot. Across both backends they correctly resolved all 52 claims predicted to be answerable, made zero false confirmations and returned unknown for 74 of 126 claim decisions. The development version adds a versioned adapter contract, a deployment constructor, linked v2 evidence and an optional Inspect AI task. [Run the study or integrate a tool](docs/observed-outcomes.md)
+The command prints scores for the file worker and a simulated joint. It writes the individual decisions to `pilot/report.json` and a signed example from each backend to `pilot/file/` and `pilot/joint/`. Use a new output directory for each run.
+
+**Pilot result.** With the same recorded observations, Guardian and a simple checker agreed on every verdict. Each correctly resolved all 52 claims the protocol predicted were answerable, returned unknown for 74 of 126 decisions and made zero false confirmations. Twelve of the unknowns were actual violations. Guardian's signed record lets another party verify which authorised operation produced each observation. The experiment covers one implementation per backend.
+
+[Study protocol](docs/observation-study-protocol.md) · [Case-level results](results/observation_pilot.json) · [Integrate a tool or run an Inspect solver](docs/observed-outcomes.md) · [Citation](CITATION.cff)
 
 ## Published v0.4.1 baseline
 
-**0.4.1 is published on GitHub and PyPI.** All 413 tests passed, including a fresh
-installation of the public package, and its hashes match the verified release.
-
-The PyPI distribution for this repository is **`guardian-runtime-assurance`**.
-The GitHub repository remains `sylvesterkaczmarek/guardian-agent-runtime`, the
-Python import remains `guardian_runtime`, and the verifier commands are unchanged.
-The similarly named `guardian-agent-runtime` on PyPI is an unrelated project.
-Do not install that distribution to obtain this code.
+The pilot and Inspect task are available from the GitHub checkout. For the earlier published benchmark, install the pinned PyPI distribution.
 
 ```bash
 python -m pip install guardian-runtime-assurance==0.4.1
 ```
 
-Version 0.4.1 corrects package identity and publication metadata; its runtime
-behaviour is unchanged from the independently reviewed GitHub release 0.4.0.
-The earlier release's tag and assets remain intact. Review the
-[migration notes](docs/migration-0.4.md),
-[release notes](docs/release-0.4.1.md) and
-[publication status](docs/publication-status.md) for the distinction between
-GitHub release assets and verified PyPI availability.
-
-The runtime isolates loaded authority and signed evidence from mutable
-caller-owned objects, preserves JSON boolean types in constraints, rechecks
-time-sensitive policy before execution, and audits malformed tool results as
-failed attempts. All 403 existing tests, including 58 independent release
-checks, are retained; distribution identity has additional regression tests.
+The Python import is `guardian_runtime`. The similarly named PyPI project `guardian-agent-runtime` has a different publisher. [Release notes](docs/release-0.4.1.md) · [Migration notes](docs/migration-0.4.md) · [Publication status](docs/publication-status.md)
 
 Run the offline demonstration after installing the checkout:
 
@@ -465,7 +457,7 @@ The checked reference dependency inventory and dependency graph are in [`results
 
 ## Cite this repository
 
-If you use or adapt this repository, please cite:
+When citing the development pilot, include the Git commit printed by `git rev-parse HEAD` so readers can reproduce the same revision. [Citation metadata](CITATION.cff)
 
 > Kaczmarek, S. (2026). *Guardian Agent Runtime*. GitHub. https://github.com/sylvesterkaczmarek/guardian-agent-runtime
 

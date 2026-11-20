@@ -16,7 +16,7 @@ The experiment covers a discrete joint simulator and a subprocess that commits v
 
 The acknowledgement scorer grades completion only. The other two scorers could decide all 26 predicted-answerable claims on each backend. Both left 37 unknown, including six actual violations. The simple checker tied Guardian on every verdict. Guardian additionally authenticates the recorder's statements and links each observed child to its authorised parent. The preregistered superiority criterion was not met. Each admission system completed the normal workflow on each backend and refused both the out-of-range and unavailable-state controls before tool invocation. Internal tool faults can still produce unwanted effects after admission.
 
-One local timing run used Python 3.12.14 on Linux x86-64, with 21 paired dispatches per backend. The p95 of the paired Guardian-minus-baseline time was 2.79 ms for the simulated joint and 10.31 ms for the file worker. Standalone signed-claim verification p95 was 1.42 ms and 2.27 ms respectively. These include ordinary host scheduling noise. Runtime construction is excluded, and the file workflow includes subprocess startup. Use `--timing` to measure your machine.
+The [initial pilot revision](https://github.com/sylvesterkaczmarek/guardian-agent-runtime/commit/2ad687c5919e7663305b491a961e06dbc717d084) recorded one timing run using Python 3.12.14 on Linux x86-64, with 21 paired dispatches per backend. The p95 of the paired Guardian-minus-baseline time was 2.79 ms for the simulated joint and 10.31 ms for the file worker. Standalone signed-claim verification p95 was 1.42 ms and 2.27 ms respectively. These include ordinary host scheduling noise. Runtime construction is excluded, and the file workflow includes subprocess startup. Use `--timing` to measure your machine.
 
 Each backend contributes seven conditions observed through three views. The 63 decisions concern three properties for each of 21 executions. They are correlated observations on one implementation. The frozen plan gives the independent replication design. Each report row contains the task truth, predicted answerability, visible samples, actual verdicts and the independently executed state-aware baseline's committed history. The separate reference-task section records all eleven benign fixtures and two write controls. The acknowledged no-op fails completion. The write followed by an exception succeeds on the final-state postcondition and retains the reported tool failure.
 
@@ -63,9 +63,18 @@ The default solver replays the 14 provided proposals offline. To replay your own
 [{"family":"file","mode":"normal","proposal":{"subject":"study-agent","session_id":"offline-trial","tool":"study","action":"commit_batch","params":{"target":4},"purpose":"study","capability_id":"parent-file","nonce":"my-run-1"}}]
 ```
 
-A team can supply an Inspect solver that outputs one action request as JSON, or use `-T live=true` with its configured model. For example, a Python evaluation can pass its solver via `eval(observation_contract(), solver=my_solver, model=my_model)`. The goal is fixed by the fixture, even if the agent proposes a different value. The score records admission, tool acknowledgement, destination completion and the signed-observation verdict. These are tool-conformance fixtures with a specified operation. They measure neither model reasoning ability nor agent robustness.
+A team can supply an Inspect solver that outputs one action request as JSON, or use `-T live=true` with its configured model. For example, a Python evaluation can pass its solver via `eval(observation_contract(), solver=my_solver, model=my_model)`. The dataset fixes the operation, goal and fixture condition for scoring. A proposal for a different operation scores zero before dispatch. A proposal for another value is evaluated against the original goal. The score records admission, tool acknowledgement, destination completion and the signed-observation verdict. These are tool-conformance fixtures with a specified operation. They measure neither model reasoning ability nor agent robustness.
 
 ## Verify and reproduce
+
+For a local format check with the pilot's public demonstration key, run these commands from the directory containing `pilot/`.
+
+```bash
+TRUSTED_KEY=$(cat pilot/file/public-key.txt)
+EXPECTED_HASH=$(python -c 'import json; print(json.load(open("pilot/file/manifest.json"))["manifest_hash"])')
+```
+
+For an independent deployment check, obtain the trusted public key and expected manifest hash from the deployment owner through a separate channel. Both checks use the same verifier commands.
 
 ```bash
 guardian-verify-manifest pilot/file/manifest.json --public-key "$TRUSTED_KEY" --manifest-hash "$EXPECTED_HASH"
