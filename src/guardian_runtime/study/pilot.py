@@ -1,13 +1,13 @@
 """Reproducible paired case-level observations; timing is opt-in and host-specific."""
 from __future__ import annotations
 
-from dataclasses import asdict, replace
+from dataclasses import asdict
 from math import ceil
 from time import perf_counter_ns
 
 from guardian_runtime.crypto import public_key_b64
 from guardian_runtime.study.reference_controls import reference_outcomes
-from guardian_runtime.study.scoring import simple_checker, verify_claims
+from guardian_runtime.study.scoring import recorded_readings, simple_checker, verify_claims
 from guardian_runtime.study.workflows import CLAIMS, FAMILIES, MODES, StudyEnvironment, proposal
 
 VIEWS = ("acknowledgement", "terminal", "trajectory")
@@ -84,10 +84,11 @@ def run_pilot(*, timing=False):
                 baseline, baseline_allowed, baseline_ns = state_gateway(family, mode, request)
                 if not decision.allowed or result is None:
                     raise RuntimeError("valid study workflow was refused")
-                readings = env.read_observer(replace(request, action="apply"), result)
+                source = f"{family}-{view}"
                 start = perf_counter_ns()
-                signed = verify_claims(bundle, key, manifest.manifest_hash, request, f"{family}-{view}", goal)
+                signed = verify_claims(bundle, key, manifest.manifest_hash, request, source, goal)
                 verify_ns = perf_counter_ns() - start
+                readings = recorded_readings(bundle, request, source)
                 truth = _truth(env.commits, goal)
                 rows.append({
                     "family": family, "mode": mode, "view": view, "truth": truth, "answerable": predictions(mode, view),

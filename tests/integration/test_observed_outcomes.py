@@ -85,8 +85,21 @@ def test_observer_failure_preserves_audited_tool_result():
     assert verify_evidence_bundle(runtime.evidence.export_bundle(policy_version=runtime.policy.version), runtime.public_key)[0]
 
 
-def test_pilot_scores_stale_and_missing_observations_as_unknown():
+def test_pilot_scores_stale_and_missing_observations_as_unknown(monkeypatch):
+    # A physical sensor may have moved on by the time the comparator runs.
+    read = StudyEnvironment.read_observer
+    seen = set()
+
+    def read_once(env, request, result):
+        if request.action == "apply":
+            if env in seen:
+                pytest.fail("pilot sampled the same operation twice")
+            seen.add(env)
+        return read(env, request, result)
+
+    monkeypatch.setattr(StudyEnvironment, "read_observer", read_once)
     report, samples = run_pilot()
+    assert len(seen) == 42
     assert len(report["rows"]) == 42
     for family in FAMILIES:
         rows = [r for r in report["rows"] if r["family"] == family]
@@ -118,6 +131,16 @@ def test_partial_observations_can_refute_but_cannot_confirm_a_trajectory():
     assert assess({"samples": [3], "terminal": True, "complete": False}, 3) == {
         "completion": True, "endpoint_in_range": True, "trajectory_in_range": None,
     }
+
+
+@pytest.mark.parametrize("readings", [
+    {"samples": [True], "terminal": True, "complete": True},
+    {"samples": [3], "terminal": "yes", "complete": True},
+    {"samples": [3], "terminal": False, "complete": True},
+])
+def test_simple_checker_leaves_invalid_or_unfinished_observations_unknown(readings):
+    from guardian_runtime.study.scoring import simple_checker
+    assert all(v is None for v in simple_checker(readings, 3).values())
 
 
 def test_fresh_policy_is_required_for_each_child():

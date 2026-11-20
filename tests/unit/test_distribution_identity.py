@@ -5,6 +5,7 @@ from pathlib import Path
 import tomllib
 
 import pytest
+import yaml
 
 from scripts.verify_distribution import validate_distribution_metadata
 
@@ -45,3 +46,5 @@ def test_supply_chain_artifacts_use_project_distribution():
     sbom = json.loads((ROOT / "results/sbom.spdx.json").read_text())
     assert sbom["packages"][0]["name"] == project["name"]
     assert sbom["packages"][0]["versionInfo"] == project["version"]
+    citation = yaml.safe_load((ROOT / "CITATION.cff").read_text())
+    assert citation["version"] == project["version"]

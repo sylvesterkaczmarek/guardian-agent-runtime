@@ -5,8 +5,7 @@ type: software
 authors:
   - family-names: Kaczmarek
     given-names: Sylvester
-year: 2026
 license: MIT
 repository-code: "https://github.com/sylvesterkaczmarek/guardian-agent-runtime"
 url: "https://github.com/sylvesterkaczmarek/guardian-agent-runtime"
-version: 0.4.1
+version: "0.5.0.dev0"

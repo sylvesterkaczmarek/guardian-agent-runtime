@@ -11,7 +11,7 @@
     "attestation": "software-signed-manifest-only",
     "benchmark_configuration": "observed-v4",
     "benchmark_configuration_hash": "799d67d10ef50cf213593c0e287d7ea0825140f30e842bfdda17093d32b85a2c",
-    "build_identifier": "source-sha256:ddac5bee9102e8f6",
+    "build_identifier": "source-sha256:fee9463f11cde41f",
     "clock_policy": "reference-fixed",
     "configuration_hash": "a5448eedb5222d7b9f31515c4088e5be40e5eee983a9bfcd6d6e72fc9e00421c",
     "guardian_version": "0.5.0.dev0",
@@ -26,12 +26,12 @@
     "profile": "reference",
     "reference_time": 2000000000,
     "signer_public_key": "/1nHzTFa34/iPboleyWvBTV1PQLMY425lWdgOAUoJ74=",
-    "source_package_sha256": "ddac5bee9102e8f6917101f58d1b76ab4196bb32ccf03b340e6dc22dacea3c32",
+    "source_package_sha256": "fee9463f11cde41f1ef5a2de0262967172af2c154530eafa98d80f491f1e02ef",
     "tool_versions": {
       "mission": "390f2663b1360c219449bb33764d85c1ad86585557d19541a0e1048dcd048649"
     }
   },
-  "manifest_hash": "9806ae243e445ddfdc4428bdc85220155c58fbbb70d4e3602a9d4044bd574269",
+  "manifest_hash": "9360cbc9ea280d7aa9b3724ae0f6dcbbf49e3981ce4029f1a9269874d69241b6",
   "public_key": "/1nHzTFa34/iPboleyWvBTV1PQLMY425lWdgOAUoJ74=",
-  "signature": "3DXiLCL68AB3LXpp9A3XpvPz6u4CKBF75TGqxcog0MJk/bRqk0xXBsuaWpIbzMBjKV46pIe3gHc/v+3ItPCmBg=="
+  "signature": "QkYJ5HUlEorzymXQ6tybjW/OC5oNebgoZHBPfkKTJq2FvSfyP59DucrOLWuEPtlY7D3UfwAO0D7osu+mkolVAw=="
 }
