@@ -18,6 +18,7 @@ def main() -> int:
         required=True,
         help="Trusted Base64 Ed25519 public key. Do not trust a key supplied only by the manifest file.",
     )
+    parser.add_argument("--manifest-hash", help="Pin the expected manifest SHA-256 digest")
     args = parser.parse_args()
 
     try:
@@ -45,6 +46,9 @@ def main() -> int:
         print_result("invalid manifest input: manifest must be an object")
         return 2
 
+    if args.manifest_hash is not None and signed.manifest_hash != args.manifest_hash:
+        print_result("runtime manifest digest differs from the expected digest")
+        return 1
     if verify_manifest(signed, public_key):
         print_result("runtime manifest valid")
         return 0

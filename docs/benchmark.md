@@ -33,7 +33,7 @@ The benchmark is local and simulated. It does not scan or exploit external syste
 
 `evidence_completeness` is the fraction of external mediated requests that leave at least one evidence record. Recursive nested actions may create additional evidence events, but those events cannot increase the external-request metric above 1.0.
 
-Coverage checks the request identity and nonce in newly appended events for each external request. An extra nested event cannot compensate for a different request with no record. `benign_task_completion_rate` requires every step of each benign task to complete successfully.
+Coverage checks the request identity and nonce in newly appended events for each external request. An extra nested event cannot compensate for a different request with no record. `benign_task_completion_rate` requires each task postcondition to hold in the independently sampled simulator state. Per-step acknowledgements and observed effects are stored separately. Verification uses the actual case bundles. The output gives the numbers of verified and checked bundles, covered and eligible external requests, and the signed-event and request counts for the separate lifecycle harnesses. Baselines without a signed log have zero eligible bundles. See [the observation pilot](observed-outcomes.md) for the separate-process and trajectory controls.
 
 `capability_overprivilege_rate` is the fraction of adversarial action proposals whose presented capability alone authorizes the canonical request before policy and invariant checks. Lifecycle, audit-tamper, delegation-model, and rate-limit harness modes are excluded because they test different properties. Architectures without a capability boundary are reported as fully exposed for this capability-layer metric.
 

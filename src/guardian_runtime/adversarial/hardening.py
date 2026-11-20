@@ -17,6 +17,7 @@ from guardian_runtime.adversarial.attacks import (
     run_benign_scenario,
 )
 from guardian_runtime.factory import reference_config_path
+from guardian_runtime.simulator import SandboxEnvironment
 from guardian_runtime.yamlutil import load_yaml_unique
 
 
@@ -82,7 +83,7 @@ def _benign_proxy_contracts() -> list[dict[str, Any]]:
     contracts: list[dict[str, Any]] = []
     for scenario in benign_scenarios():
         for request in scenario.requests:
-            if request.tool != "sandbox" or request.action != "proxy_call":
+            if request.tool != "sandbox" or request.action not in SandboxEnvironment.composite_actions:
                 continue
             contracts.append(
                 {
@@ -100,7 +101,7 @@ def _propose_defense(minimized: list[Scenario]) -> dict[str, Any] | None:
         for scenario in minimized
         if scenario.requests
         and scenario.requests[0].tool == "sandbox"
-        and scenario.requests[0].action == "proxy_call"
+        and scenario.requests[0].action in SandboxEnvironment.composite_actions
     ]
     if not proxy_bypasses:
         return None

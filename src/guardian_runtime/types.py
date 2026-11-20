@@ -90,3 +90,13 @@ class EvidenceEvent:
         data = asdict(self)
         data.pop("signature", None)
         return data
+
+
+@dataclass(frozen=True)
+class ObservedEvidenceEvent(EvidenceEvent):
+    schema_version: int
+    permit_id: str | None
+    parent_permit_id: str | None
+    tool_ok: bool | None
+    tool_status: str | None
+    observation: Mapping[str, Any] | None

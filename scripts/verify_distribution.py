@@ -95,6 +95,11 @@ def main() -> int:
         run(["-m", "pytest"])
         run(["formal/check_model.py"])
         run(["scripts/showcase.py", "--output", str(root / "showcase")])
+        study = root / "observation-study"
+        run(["-m", "guardian_runtime.study.cli", "--output", str(study)])
+        report = json.loads((study / "report.json").read_text(encoding="utf-8"))
+        if len(report["rows"]) != 42 or not all(r["truth_agrees_across_executions"] for r in report["rows"]):
+            raise ValueError("installed pilot failed its paired controls")
         proof = root / "showcase"
         public_key = (proof / "public-key.txt").read_text(encoding="utf-8").strip()
         run(["-m", "guardian_runtime.verifier.cli", str(proof / "evidence.json"), "--public-key", public_key])

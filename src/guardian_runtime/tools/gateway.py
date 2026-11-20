@@ -48,6 +48,7 @@ class ToolGateway:
         runtime_manifest_hash: str,
         on_execution: ExecutionObserver | None = None,
         mediate_nested_actions: bool = False,
+        composite_actions: tuple[str, ...] | None = None,
         execution_policy_check: ExecutionPolicyCheck | None = None,
     ) -> None:
         self._environment = environment
@@ -59,6 +60,10 @@ class ToolGateway:
         self._on_execution = on_execution
         self._execution_policy_check = execution_policy_check
         self._mediate_nested_actions = mediate_nested_actions
+        self._composite_actions = frozenset(
+            getattr(environment, "composite_actions", ("proxy_call",)) if composite_actions is None else composite_actions
+        )
+        self._parent_permits: list[str] = []
         self._nested_executor: NestedExecutor | None = None
         self._used_permits: set[str] = set()
         self._used_sequences: set[int] = set()
@@ -70,17 +75,37 @@ class ToolGateway:
 
         self._nested_executor = executor
 
-    def _execute_nested(self, request: ActionRequest) -> ToolResult:
+    @property
+    def parent_permit_id(self) -> str | None:
+        return self._parent_permits[-1] if self._parent_permits else None
+
+    def _execute_nested(self, request: ActionRequest, permit_id: str) -> ToolResult:
         if self._nested_executor is None:
             raise PermitError("nested action mediation is enabled but no nested executor is configured")
-        builder = getattr(self._environment, "build_nested_request", None)
+        many = getattr(self._environment, "build_nested_requests", None)
+        builder = many if callable(many) else getattr(self._environment, "build_nested_request", None)
         if not callable(builder):
             raise PermitError("environment does not expose a nested request builder")
         try:
-            nested_request = builder(request)
+            children = builder(request) if callable(many) else (builder(request),)
+            if type(children) is not tuple or not 1 <= len(children) <= 64:
+                raise ValueError("adapter must return a bounded nonempty tuple of child requests")
+            if len(self._parent_permits) >= 16:
+                raise ValueError("composition depth limit reached")
+            for child in children:
+                if not isinstance(child, ActionRequest) or (child.subject, child.session_id) != (request.subject, request.session_id):
+                    raise ValueError("invalid child request or child identity")
         except (TypeError, ValueError) as exc:
             raise PermitError(f"invalid nested action request: {exc}") from exc
-        return self._nested_executor(nested_request)
+        self._parent_permits.append(permit_id)
+        try:
+            for child in children:
+                result = self._nested_executor(child)
+                if not result.ok:
+                    break
+            return result
+        finally:
+            self._parent_permits.pop()
 
     def execute(self, request: ActionRequest, permit: ExecutionPermit) -> ToolResult:
         with self._execution_lock:
@@ -140,8 +165,8 @@ class ToolGateway:
         self._used_permits.add(permit_fingerprint)
         self.execution_count += 1
         try:
-            if self._mediate_nested_actions and request.action == "proxy_call":
-                nested_result = self._execute_nested(request)
+            if self._mediate_nested_actions and request.action in self._composite_actions:
+                nested_result = self._execute_nested(request, permit_fingerprint)
                 result = ToolResult(
                     nested_result.ok,
                     "proxied-mediated" if nested_result.ok else (

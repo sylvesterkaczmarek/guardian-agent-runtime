@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased 0.5 development
+
+- Score benign reference tasks against observed state and report acknowledgements separately.
+- Bind tool builds and permit lifetimes in signed manifests. Link composed calls and observer readings in v2 evidence, with v1 verification retained.
+- Add the offline file and joint study and the optional Inspect AI task. See [results and integration](docs/observed-outcomes.md).
+
 ## 0.4.1
 
 - Publish under `guardian-runtime-assurance`; the `guardian-agent-runtime` PyPI

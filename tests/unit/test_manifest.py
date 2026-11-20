@@ -14,6 +14,6 @@ def test_runtime_manifest_binds_benchmark_configuration():
     from guardian_runtime.factory import build_guardian
 
     _, signed, manifest = build_guardian("mission", hardened=True)
-    assert manifest["benchmark_configuration"] == "reference-v3"
+    assert manifest["benchmark_configuration"] == "observed-v4"
     assert len(manifest["benchmark_configuration_hash"]) == 64
     assert signed.manifest["benchmark_configuration_hash"] == manifest["benchmark_configuration_hash"]

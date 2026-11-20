@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "guardian-runtime-assurance"
-version = "0.4.1"
+version = "0.5.0.dev0"
 description = "Reference monitor and adversarial benchmark for securing privileged actions by agentic systems."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -23,6 +23,7 @@ Issues = "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/issues"
 Changelog = "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
+inspect = ["inspect-ai>=0.3.291,<0.4"]
 dev = [
   "hypothesis>=6.130,<7",
   "mypy>=1.15,<2",
@@ -32,8 +33,12 @@ dev = [
 ]
 
 [project.scripts]
+guardian-study = "guardian_runtime.study.cli:main"
 guardian-verify = "guardian_runtime.verifier.cli:main"
 guardian-verify-manifest = "guardian_runtime.verifier.manifest_cli:main"
+
+[project.entry-points.inspect_ai]
+guardian_runtime = "guardian_runtime.study.inspect_task"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -79,4 +84,4 @@ module = ["guardian_runtime.adversarial.attacks"]
 disable_error_code = ["assignment"]
 
 [tool.setuptools.package-data]
-"guardian_runtime.resources" = ["guardian/*.yaml", "capabilities/*.yaml", "benchmarks/*.yaml"]
+"guardian_runtime.resources" = ["guardian/*.yaml", "capabilities/*.yaml", "benchmarks/*.yaml", "study/*.yaml"]

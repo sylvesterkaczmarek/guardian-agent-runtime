@@ -1,0 +1,58 @@
+{
+  "public_key": "/1nHzTFa34/iPboleyWvBTV1PQLMY425lWdgOAUoJ74=",
+  "bundle": {
+    "format": "guardian-evidence-bundle-v1",
+    "events": [
+      {
+        "sequence": 1,
+        "timestamp": 2000000000,
+        "session_id": "reference-session",
+        "subject": "agent-1",
+        "requested_action": {
+          "subject": "agent-1",
+          "session_id": "reference-session",
+          "tool": "mission",
+          "action": "observe_telemetry",
+          "resource": "",
+          "params": {},
+          "purpose": "operations",
+          "capability_id": "cap-observe",
+          "nonce": "b1",
+          "observed_state_version": null,
+          "context": {}
+        },
+        "normalized_action": {
+          "subject": "agent-1",
+          "session_id": "reference-session",
+          "tool": "mission",
+          "action": "observe_telemetry",
+          "resource": "",
+          "params": {},
+          "purpose": "operations",
+          "capability_id": "cap-observe",
+          "nonce": "b1",
+          "observed_state_version": null,
+          "context": {}
+        },
+        "decision": "allow",
+        "decision_reason": "authorized and invariant-safe",
+        "rule_id": "allow-mission-observe",
+        "policy_version": "1.2-hardened",
+        "capability_id": "cap-observe",
+        "runtime_manifest_hash": "b704272de2ce3cf339b3f7b8ca0c0f402f61e2569953d6e5756a5561b916e78f",
+        "result_digest": "880de82902a45c4d7cbba8b61de708bc5efe660a92b3c099a54c426c5d2ea352",
+        "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "event_hash": "8a41f06d98da9af170db3437c0474ae1d055e957a21284354107c2cf3f57760f",
+        "signature": "PnTE4xfW2yWU1RRnP4p8K/Zpezhf0dkBu6ihBvUdeCYRsMw3iACAoXMrlLzcPewJy8AN9eRk5wRqSp9I2sspDA=="
+      }
+    ],
+    "checkpoint": {
+      "checkpoint_version": "1",
+      "event_count": 1,
+      "terminal_hash": "8a41f06d98da9af170db3437c0474ae1d055e957a21284354107c2cf3f57760f",
+      "policy_version": "1.2-hardened",
+      "runtime_manifest_hash": "b704272de2ce3cf339b3f7b8ca0c0f402f61e2569953d6e5756a5561b916e78f",
+      "signature": "O7pW8MB2+xRGO/Z7ZBT1EUUSFIRuk2fUExGIwHVT39Dz5FAh5tZ4XlMbv2CQgWfvywPzy2Gz0zMtEKRwdDnCBg=="
+    }
+  }
+}

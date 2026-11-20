@@ -33,4 +33,4 @@ def test_showcase_does_not_overwrite_prior_evidence(tmp_path):
 def test_showcase_report_is_json_serializable():
     report, bundle, _ = run_showcase()
     assert json.loads(json.dumps(report)) == report
-    assert bundle["format"] == "guardian-evidence-bundle-v1"
+    assert bundle["format"] == "guardian-evidence-bundle-v2"

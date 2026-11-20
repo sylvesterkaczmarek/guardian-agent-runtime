@@ -12,11 +12,11 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey,
 
 from guardian_runtime.canonical import canonical_json, digest_json
 from guardian_runtime.crypto import sign_object, verify_object
-from guardian_runtime.types import ActionRequest, Decision, EvidenceEvent, ToolResult
+from guardian_runtime.types import ActionRequest, Decision, EvidenceEvent, ObservedEvidenceEvent, ToolResult
 
 
 GENESIS_HASH = "0" * 64
-CHECKPOINT_VERSION = "1"
+CHECKPOINT_VERSION = "2"
 MAX_EVIDENCE_DEPTH = 64
 _HASH = re.compile(r"[0-9a-f]{64}\Z")
 
@@ -169,11 +169,11 @@ def _safe_identifier(value: Any) -> str:
 
 
 class EvidenceLog:
-    def __init__(self, private_key: Ed25519PrivateKey, runtime_manifest_hash: str) -> None:
+    def __init__(self, private_key: Ed25519PrivateKey, runtime_manifest_hash: str, *, lock: RLock | None = None) -> None:
         self._private_key = private_key
         self._manifest_hash = runtime_manifest_hash
         self._events: list[EvidenceEvent] = []
-        self._lock = RLock()
+        self._lock = lock if lock is not None else RLock()
 
     @property
     def events(self) -> tuple[EvidenceEvent, ...]:
@@ -188,6 +188,8 @@ class EvidenceLog:
         decision: Decision,
         policy_version: str,
         result: ToolResult | None,
+        parent_permit_id: str | None = None,
+        observation: Mapping[str, Any] | None = None,
     ) -> EvidenceEvent:
         with self._lock:
             sequence = len(self._events) + 1
@@ -195,6 +197,12 @@ class EvidenceLog:
             normalized = decision.normalized_request.to_dict() if decision.normalized_request else None
             result_digest = digest_json(_result_snapshot(result)) if result is not None else ""
             payload = {
+                "schema_version": 2,
+                "permit_id": digest_json(asdict(decision.permit)) if decision.permit else None,
+                "parent_permit_id": parent_permit_id,
+                "tool_ok": result.ok if result is not None else None,
+                "tool_status": result.status if result is not None else None,
+                "observation": deepcopy(observation),
                 "sequence": sequence,
                 "timestamp": timestamp,
                 "session_id": _safe_identifier(request.session_id),
@@ -213,7 +221,7 @@ class EvidenceLog:
             event_hash = hashlib.sha256(canonical_json(payload)).hexdigest()
             signed_payload = {**payload, "event_hash": event_hash}
             signature = sign_object(self._private_key, signed_payload)
-            event = EvidenceEvent(**signed_payload, signature=signature)
+            event = ObservedEvidenceEvent(**signed_payload, signature=signature)
             self._events.append(event)
             return deepcopy(event)
 
@@ -243,13 +251,30 @@ class EvidenceLog:
         # Both parts describe one snapshot even if execution appends concurrently.
         events = self.events
         return {
-            "format": "guardian-evidence-bundle-v1",
+            "format": "guardian-evidence-bundle-v2",
             "events": [asdict(event) for event in events],
             "checkpoint": asdict(self._checkpoint_for(events, policy_version=policy_version)),
         }
 
 
 def _event_schema_error(event: EvidenceEvent) -> str | None:
+    if isinstance(event, ObservedEvidenceEvent):
+        if type(event.schema_version) is not int or event.schema_version != 2:
+            return "invalid event schema version"
+        for value in (event.permit_id, event.parent_permit_id):
+            if value is not None and (not isinstance(value, str) or _HASH.fullmatch(value) is None):
+                return "invalid permit identifier"
+        if event.result_digest:
+            if type(event.tool_ok) is not bool or not isinstance(event.tool_status, str) or not event.tool_status:
+                return "invalid tool outcome"
+        elif event.tool_ok is not None or event.tool_status is not None:
+            return "unexpected tool outcome"
+        if event.observation is not None:
+            observation = event.observation
+            if (not isinstance(observation, Mapping) or set(observation) != {"source", "readings"}
+                    or not isinstance(observation["source"], str) or not observation["source"]
+                    or (observation["readings"] is not None and not isinstance(observation["readings"], Mapping))):
+                return "malformed observer record"
     if type(event.sequence) is not int or event.sequence < 1:
         return "sequence must be a positive integer"
     if type(event.timestamp) is not int:
@@ -299,7 +324,12 @@ def verify_events(
     expected_sequence = 1
     for raw in events:
         try:
-            event = raw if isinstance(raw, EvidenceEvent) else EvidenceEvent(**dict(raw))
+            if isinstance(raw, EvidenceEvent):
+                event = raw
+            else:
+                fields = dict(raw)
+                event_type = ObservedEvidenceEvent if "schema_version" in fields else EvidenceEvent
+                event = event_type(**fields)
         except (TypeError, ValueError) as exc:
             return False, f"malformed evidence event at sequence {expected_sequence}: {exc}"
         schema_error = _event_schema_error(event)
@@ -343,7 +373,8 @@ def verify_evidence_bundle(
 ) -> tuple[bool, str]:
     if not isinstance(bundle, Mapping):
         return False, "evidence bundle must be an object"
-    if bundle.get("format") != "guardian-evidence-bundle-v1":
+    fmt = bundle.get("format")
+    if fmt not in ("guardian-evidence-bundle-v1", "guardian-evidence-bundle-v2"):
         return False, "unsupported evidence bundle format"
     raw_events = bundle.get("events")
     raw_checkpoint = bundle.get("checkpoint")
@@ -357,7 +388,10 @@ def verify_evidence_bundle(
     schema_error = _checkpoint_schema_error(checkpoint)
     if schema_error is not None:
         return False, f"malformed evidence checkpoint: {schema_error}"
-    if checkpoint.checkpoint_version != CHECKPOINT_VERSION:
+    version = "2" if fmt == "guardian-evidence-bundle-v2" else "1"
+    if any(not isinstance(event, Mapping) or ("schema_version" in event) != (version == "2") for event in raw_events):
+        return False, "event format differs from bundle"
+    if checkpoint.checkpoint_version != version:
         return False, "unsupported evidence checkpoint version"
     if not verify_object(public_key, checkpoint.unsigned_dict(), checkpoint.signature):
         return False, "evidence checkpoint signature verification failed"
@@ -385,4 +419,19 @@ def verify_evidence_bundle(
         return False, "evidence event count does not match signed checkpoint"
     if checkpoint.terminal_hash != terminal_hash:
         return False, "evidence terminal hash does not match signed checkpoint"
+    if version == "2":
+        # Children finish before their enclosing operation. Reverse traversal
+        # resolves each parent by its signed identifier within this bundle.
+        requested_parents = {e["parent_permit_id"] for e in raw_events if e["parent_permit_id"] is not None}
+        parents: dict[str, tuple[str, str]] = {}
+        for event in reversed(raw_events):
+            identity = (event["session_id"], event["subject"])
+            parent = event["parent_permit_id"]
+            if parent is not None and parents.get(parent) != identity:
+                return False, "unresolved parent permit"
+            permit_id = event["permit_id"]
+            if permit_id is not None:
+                if permit_id in parents and permit_id in requested_parents:
+                    return False, "ambiguous parent permit"
+                parents[permit_id] = identity
     return True, "evidence bundle valid"

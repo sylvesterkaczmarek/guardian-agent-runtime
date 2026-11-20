@@ -5,18 +5,18 @@
     "guardian_initial",
     "guardian_hardened"
   ],
-  "benchmark": "guardian-agent-runtime-reference-v3",
+  "benchmark": "guardian-agent-runtime-observed-v4",
   "benchmark_config_sha256": "799d67d10ef50cf213593c0e287d7ea0825140f30e842bfdda17093d32b85a2c",
   "benign_cases": 11,
-  "build_identifier": "source-sha256:c2a53095b1f3f4ff",
+  "build_identifier": "source-sha256:ddac5bee9102e8f6",
   "dependency_lock_sha256": "89b94a0573785d365395f0f5243862348b85712a61a9e85fcb1987d9a9c83d29",
   "fixed_attack_cases": 26,
   "generated_attack_cases_per_seed": 24,
   "latency": "Host-dependent latency is measured separately with `make latency` and excluded from deterministic reference outputs.",
   "reference_time": 2000000000,
-  "research_source_sha256": "e640d454bf77a1e8931f5782283715dc3dff9677bfed39dd98077ccec4b81690",
-  "runtime_manifest_hash": "b704272de2ce3cf339b3f7b8ca0c0f402f61e2569953d6e5756a5561b916e78f",
-  "schema_version": 2,
+  "research_source_sha256": "ff2ca891aeb6761ffd5240a0a4168f3c144a55e02dbd86e09118a39448879a8b",
+  "runtime_manifest_hash": "9806ae243e445ddfdc4428bdc85220155c58fbbb70d4e3602a9d4044bd574269",
+  "schema_version": 3,
   "seeds": [
     7,
     17,
@@ -24,7 +24,7 @@
     41,
     53
   ],
-  "source_package_sha256": "c2a53095b1f3f4ff98e2f3263348113a190c5dfd4fd85c67c20d19f3c7e2af1e",
+  "source_package_sha256": "ddac5bee9102e8f6917101f58d1b76ab4196bb32ccf03b340e6dc22dacea3c32",
   "summary": {
     "guardian_hardened": {
       "attack_success_by_class": {

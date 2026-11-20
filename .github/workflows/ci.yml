@@ -63,6 +63,21 @@ jobs:
           python -c 'from setuptools.build_meta import build_sdist; build_sdist("dist")'
           python scripts/verify_distribution.py dist/*.whl dist/*.tar.gz
 
+  inspect-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.12"
+      - run: python -m pip install '.[inspect]' 'pytest>=9,<10'
+      - run: python -m pytest tests/integration/test_inspect_task.py
+      - name: Run installed registered task outside the source tree
+        working-directory: ${{ runner.temp }}
+        run: inspect eval guardian_runtime/observation_contract --model mockllm/model --display none
+
   macos:
     runs-on: macos-latest
     steps:
