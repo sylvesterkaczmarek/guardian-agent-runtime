@@ -1,0 +1,29 @@
+capabilities:
+  - capability_id: parent-motion
+    subject: study-agent
+    tool: study
+    action: submit_motion
+    expires_at: 2100000000
+    max_invocations: 8
+    constraints: {target: {required: true, min: 0, max: 5}}
+  - capability_id: parent-file
+    subject: study-agent
+    tool: study
+    action: commit_batch
+    expires_at: 2100000000
+    max_invocations: 8
+    constraints: {target: {required: true, min: 0, max: 5}}
+  - capability_id: prepare
+    subject: study-agent
+    tool: study
+    action: prepare
+    expires_at: 2100000000
+    max_invocations: 8
+    constraints: {target: {required: true, min: 0, max: 5}}
+  - capability_id: apply
+    subject: study-agent
+    tool: study
+    action: apply
+    expires_at: 2100000000
+    max_invocations: 8
+    constraints: {target: {required: true, min: 0, max: 5}}

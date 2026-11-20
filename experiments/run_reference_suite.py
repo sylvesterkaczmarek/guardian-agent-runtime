@@ -27,9 +27,8 @@ from guardian_runtime.adversarial.hardening import run_self_hardening
 from guardian_runtime.canonical import CanonicalizationError, canonicalize_request
 from guardian_runtime.crypto import public_key_b64
 from guardian_runtime.evaluation import summarize_runs
-from guardian_runtime.evidence import verify_evidence_bundle
 from guardian_runtime.factory import REFERENCE_TIME, ROOT, build_guardian, load_capability_store
-from guardian_runtime.types import ActionRequest
+from guardian_runtime.study.pilot import run_pilot
 from guardian_runtime.yamlutil import load_yaml_unique
 
 
@@ -37,6 +36,7 @@ OUT = ROOT / "results"
 FIG = OUT / "figures"
 DETERMINISTIC_RESULT_FILES = (
     "runs.json",
+    "observation_pilot.json",
     "reference_summary.json",
     "hardening_history.json",
     "generated_regressions.json",
@@ -67,30 +67,6 @@ def _research_source_sha256() -> str:
         hasher.update(len(data).to_bytes(8, "big"))
         hasher.update(data)
     return hasher.hexdigest()
-
-
-def _audit_verification(architecture: str) -> float:
-    if not architecture.startswith("guardian"):
-        return 0.0
-    runtime, signed_manifest, _ = build_guardian("mission", hardened=architecture == "guardian_hardened")
-    request = ActionRequest(
-        subject="agent-1",
-        session_id="audit-check",
-        tool="mission",
-        action="observe_telemetry",
-        capability_id="cap-observe",
-        nonce="audit-1",
-        purpose="operations",
-    )
-    runtime.execute_request(request)
-    bundle = runtime.evidence.export_bundle(policy_version=runtime.policy.version)
-    ok, _ = verify_evidence_bundle(
-        bundle,
-        runtime.public_key,
-        expected_policy_version=runtime.policy.version,
-        expected_manifest_hash=signed_manifest.manifest_hash,
-    )
-    return float(ok)
 
 
 def _critical(case_name: str, domain: str) -> bool:
@@ -181,6 +157,11 @@ def run_one(seed: int, architecture: str, *, generated_count: int = 24) -> dict[
     )
     total_requests = sum(result.request_count for result in attack_results + benign_results)
 
+    verification = [r.bundle_verified for r in attack_results + benign_results if r.bundle_verified is not None]
+    lifecycle = [
+        {"case": c.name, "mode": c.mode, "harness_requests": r.request_count, "signed_events": r.evidence_events}
+        for c, r in zip(attacks, attack_results, strict=True) if c.mode in excluded_modes
+    ]
     by_class: dict[str, float] = {}
     for scenario_class in sorted({case.scenario_class for case in attacks}):
         values = [
@@ -202,7 +183,13 @@ def run_one(seed: int, architecture: str, *, generated_count: int = 24) -> dict[
         "evidence_completeness": (
             evidence_covered_requests / evidence_requests if evidence_requests else 0.0
         ),
-        "audit_verification_success": _audit_verification(architecture),
+        "audit_verification_success": sum(verification) / len(verification) if verification else 0.0,
+        "evidence_counts": {
+            "verified_bundles": sum(verification), "checked_bundles": len(verification),
+            "covered_requests": evidence_covered_requests, "eligible_requests": evidence_requests,
+            "lifecycle_harness": lifecycle,
+        },
+        "observed_benign_tasks": {"completed": sum(benign_values), "total": len(benign_values)},
         "tampering_detection_rate": float(np.mean([not result.attack_success for result in tamper_results])),
         "capability_overprivilege_rate": capability_overprivilege_rate,
         "policy_coverage": explicit_rule_requests / total_requests if total_requests else 0.0,
@@ -336,8 +323,8 @@ def main() -> int:
     (OUT / "reference_summary.json").write_text(
         json.dumps(
             {
-                "schema_version": 2,
-                "benchmark": "guardian-agent-runtime-reference-v3",
+                "schema_version": 3,
+                "benchmark": "guardian-agent-runtime-observed-v4",
                 "benchmark_config_sha256": hashlib.sha256(config_path.read_bytes()).hexdigest(),
                 "dependency_lock_sha256": hashlib.sha256((ROOT / "requirements.lock").read_bytes()).hexdigest(),
                 "runtime_manifest_hash": signed_manifest.manifest_hash,
@@ -376,6 +363,8 @@ def main() -> int:
     )
     (OUT / "negative_results.json").write_text(json.dumps(negative_results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
+    pilot, _ = run_pilot()
+    (OUT / "observation_pilot.json").write_text(json.dumps(pilot, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     _write_manifest(manifest, signed_manifest, public_key_b64(runtime.public_key))
     _plot(summary, hardening)
     _generate_supply_chain_outputs()

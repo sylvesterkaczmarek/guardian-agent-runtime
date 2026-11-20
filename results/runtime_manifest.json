@@ -1,23 +1,37 @@
 {
   "manifest": {
+    "adapter": {
+      "build_sha256": "390f2663b1360c219449bb33764d85c1ad86585557d19541a0e1048dcd048649",
+      "composite_actions": [
+        "proxy_call"
+      ],
+      "name": "guardian_runtime.simulator.mission.MissionEnvironment"
+    },
+    "adapter_contract_version": 1,
     "attestation": "software-signed-manifest-only",
-    "benchmark_configuration": "reference-v3",
+    "benchmark_configuration": "observed-v4",
     "benchmark_configuration_hash": "799d67d10ef50cf213593c0e287d7ea0825140f30e842bfdda17093d32b85a2c",
-    "build_identifier": "source-sha256:c2a53095b1f3f4ff",
+    "build_identifier": "source-sha256:ddac5bee9102e8f6",
+    "clock_policy": "reference-fixed",
     "configuration_hash": "a5448eedb5222d7b9f31515c4088e5be40e5eee983a9bfcd6d6e72fc9e00421c",
-    "guardian_version": "0.4.1",
+    "guardian_version": "0.5.0.dev0",
     "nested_action_mediation": "guardian-recursive",
+    "observer_source": null,
+    "permit_ttl_seconds": 5,
     "permitted_tools": [
       "mission"
     ],
     "policy_hash": "a12ced707f570117db194757e85990de7bb33e1d3d4fab4cba76a229928ecae5",
     "policy_version": "1.2-hardened",
-    "source_package_sha256": "c2a53095b1f3f4ff98e2f3263348113a190c5dfd4fd85c67c20d19f3c7e2af1e",
+    "profile": "reference",
+    "reference_time": 2000000000,
+    "signer_public_key": "/1nHzTFa34/iPboleyWvBTV1PQLMY425lWdgOAUoJ74=",
+    "source_package_sha256": "ddac5bee9102e8f6917101f58d1b76ab4196bb32ccf03b340e6dc22dacea3c32",
     "tool_versions": {
-      "mission": "sim-3"
+      "mission": "390f2663b1360c219449bb33764d85c1ad86585557d19541a0e1048dcd048649"
     }
   },
-  "manifest_hash": "b704272de2ce3cf339b3f7b8ca0c0f402f61e2569953d6e5756a5561b916e78f",
+  "manifest_hash": "9806ae243e445ddfdc4428bdc85220155c58fbbb70d4e3602a9d4044bd574269",
   "public_key": "/1nHzTFa34/iPboleyWvBTV1PQLMY425lWdgOAUoJ74=",
-  "signature": "nXMRxqK3wy2PYNPr+PKC/FQueF4uoJG3NJOK88UL94nwm22httn/AKhkOuaOa/hutywFIM0QqBcqALQT5GoOAg=="
+  "signature": "3DXiLCL68AB3LXpp9A3XpvPz6u4CKBF75TGqxcog0MJk/bRqk0xXBsuaWpIbzMBjKV46pIe3gHc/v+3ItPCmBg=="
 }

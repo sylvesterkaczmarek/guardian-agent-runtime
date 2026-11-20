@@ -1,0 +1,2572 @@
+{
+  "independent_implementations_per_family": 1,
+  "population_interval": null,
+  "prevention_controls": [
+    {
+      "condition": "out_of_range",
+      "family": "joint",
+      "gateway_admitted": false,
+      "gateway_invocations": 0,
+      "guardian_admitted": false,
+      "guardian_invocations": 0
+    },
+    {
+      "condition": "unready",
+      "family": "joint",
+      "gateway_admitted": false,
+      "gateway_invocations": 0,
+      "guardian_admitted": false,
+      "guardian_invocations": 0
+    },
+    {
+      "condition": "out_of_range",
+      "family": "file",
+      "gateway_admitted": false,
+      "gateway_invocations": 0,
+      "guardian_admitted": false,
+      "guardian_invocations": 0
+    },
+    {
+      "condition": "unready",
+      "family": "file",
+      "gateway_admitted": false,
+      "gateway_invocations": 0,
+      "guardian_admitted": false,
+      "guardian_invocations": 0
+    }
+  ],
+  "reference_benign_controls": [
+    {
+      "completed": true,
+      "mode": "reference",
+      "observed_effects": [
+        true
+      ],
+      "task": "observe_telemetry",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": true,
+      "mode": "reference",
+      "observed_effects": [
+        true
+      ],
+      "task": "point_payload",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": true,
+      "mode": "reference",
+      "observed_effects": [
+        true
+      ],
+      "task": "change_power",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": true,
+      "mode": "reference",
+      "observed_effects": [
+        true
+      ],
+      "task": "small_maneuver",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": true,
+      "mode": "reference",
+      "observed_effects": [
+        true
+      ],
+      "task": "schedule_science",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": true,
+      "mode": "reference",
+      "observed_effects": [
+        true
+      ],
+      "task": "read_tmp_file",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": true,
+      "mode": "reference",
+      "observed_effects": [
+        true
+      ],
+      "task": "write_tmp_file",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": true,
+      "mode": "reference",
+      "observed_effects": [
+        true
+      ],
+      "task": "bounded_actuator",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": true,
+      "mode": "reference",
+      "observed_effects": [
+        true
+      ],
+      "task": "mock_network",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": true,
+      "mode": "reference",
+      "observed_effects": [
+        true
+      ],
+      "task": "safe_proxy_read",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": true,
+      "mode": "reference",
+      "observed_effects": [
+        true
+      ],
+      "task": "enter_safe_mode",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": false,
+      "mode": "acknowledged_noop",
+      "observed_effects": [
+        false
+      ],
+      "task": "write_tmp_file",
+      "tool_acknowledgements": [
+        true
+      ],
+      "verified": true
+    },
+    {
+      "completed": true,
+      "mode": "committed_error",
+      "observed_effects": [
+        true
+      ],
+      "task": "write_tmp_file",
+      "tool_acknowledgements": [
+        false
+      ],
+      "verified": true
+    }
+  ],
+  "rows": [
+    {
+      "actual_commits": [
+        0,
+        2,
+        3
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        2,
+        3
+      ],
+      "family": "joint",
+      "mode": "normal",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        2,
+        3
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        2,
+        3
+      ],
+      "family": "joint",
+      "mode": "normal",
+      "observations": {
+        "complete": false,
+        "samples": [
+          3
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        2,
+        3
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        2,
+        3
+      ],
+      "family": "joint",
+      "mode": "normal",
+      "observations": {
+        "complete": true,
+        "samples": [
+          0,
+          2,
+          3
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0
+      ],
+      "family": "joint",
+      "mode": "acknowledged_noop",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0
+      ],
+      "family": "joint",
+      "mode": "acknowledged_noop",
+      "observations": {
+        "complete": false,
+        "samples": [
+          0
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": false,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": false,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0
+      ],
+      "family": "joint",
+      "mode": "acknowledged_noop",
+      "observations": {
+        "complete": true,
+        "samples": [
+          0
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": false,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        },
+        "simple_checker": {
+          "completion": false,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0,
+        3
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        3
+      ],
+      "family": "joint",
+      "mode": "committed_error",
+      "observations": {},
+      "tool_ok": false,
+      "tool_status": "proxy-nested-failed",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": false,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        3
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        3
+      ],
+      "family": "joint",
+      "mode": "committed_error",
+      "observations": {
+        "complete": false,
+        "samples": [
+          3
+        ],
+        "terminal": true
+      },
+      "tool_ok": false,
+      "tool_status": "proxy-nested-failed",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": false,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        3
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        3
+      ],
+      "family": "joint",
+      "mode": "committed_error",
+      "observations": {
+        "complete": true,
+        "samples": [
+          0,
+          3
+        ],
+        "terminal": true
+      },
+      "tool_ok": false,
+      "tool_status": "proxy-nested-failed",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": false,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0,
+        7,
+        3
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7,
+        3
+      ],
+      "family": "joint",
+      "mode": "excursion",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        7,
+        3
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7,
+        3
+      ],
+      "family": "joint",
+      "mode": "excursion",
+      "observations": {
+        "complete": false,
+        "samples": [
+          3
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        7,
+        3
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7,
+        3
+      ],
+      "family": "joint",
+      "mode": "excursion",
+      "observations": {
+        "complete": true,
+        "samples": [
+          0,
+          7,
+          3
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": false
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": false
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0,
+        7
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7
+      ],
+      "family": "joint",
+      "mode": "wrong_final",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        7
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7
+      ],
+      "family": "joint",
+      "mode": "wrong_final",
+      "observations": {
+        "complete": false,
+        "samples": [
+          7
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": false,
+          "endpoint_in_range": false,
+          "trajectory_in_range": false
+        },
+        "simple_checker": {
+          "completion": false,
+          "endpoint_in_range": false,
+          "trajectory_in_range": false
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        7
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7
+      ],
+      "family": "joint",
+      "mode": "wrong_final",
+      "observations": {
+        "complete": true,
+        "samples": [
+          0,
+          7
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": false,
+          "endpoint_in_range": false,
+          "trajectory_in_range": false
+        },
+        "simple_checker": {
+          "completion": false,
+          "endpoint_in_range": false,
+          "trajectory_in_range": false
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0,
+        2,
+        3
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        2,
+        3
+      ],
+      "family": "joint",
+      "mode": "missing",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        2,
+        3
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        2,
+        3
+      ],
+      "family": "joint",
+      "mode": "missing",
+      "observations": {
+        "complete": false,
+        "samples": [],
+        "terminal": false
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        2,
+        3
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        2,
+        3
+      ],
+      "family": "joint",
+      "mode": "missing",
+      "observations": {
+        "complete": false,
+        "samples": [],
+        "terminal": false
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0,
+        2,
+        3
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        2,
+        3
+      ],
+      "family": "joint",
+      "mode": "delayed",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        2,
+        3
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        2,
+        3
+      ],
+      "family": "joint",
+      "mode": "delayed",
+      "observations": {
+        "complete": false,
+        "samples": [
+          2
+        ],
+        "terminal": false
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        2,
+        3
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        2,
+        3
+      ],
+      "family": "joint",
+      "mode": "delayed",
+      "observations": {
+        "complete": false,
+        "samples": [
+          0,
+          2
+        ],
+        "terminal": false
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0,
+        1,
+        4
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        1,
+        4
+      ],
+      "family": "file",
+      "mode": "normal",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        1,
+        4
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        1,
+        4
+      ],
+      "family": "file",
+      "mode": "normal",
+      "observations": {
+        "complete": false,
+        "samples": [
+          4
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        1,
+        4
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        1,
+        4
+      ],
+      "family": "file",
+      "mode": "normal",
+      "observations": {
+        "complete": true,
+        "samples": [
+          0,
+          1,
+          4
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0
+      ],
+      "family": "file",
+      "mode": "acknowledged_noop",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0
+      ],
+      "family": "file",
+      "mode": "acknowledged_noop",
+      "observations": {
+        "complete": false,
+        "samples": [
+          0
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": false,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": false,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0
+      ],
+      "family": "file",
+      "mode": "acknowledged_noop",
+      "observations": {
+        "complete": true,
+        "samples": [
+          0
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": false,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        },
+        "simple_checker": {
+          "completion": false,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0,
+        4
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        4
+      ],
+      "family": "file",
+      "mode": "committed_error",
+      "observations": {},
+      "tool_ok": false,
+      "tool_status": "proxy-nested-failed",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": false,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        4
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        4
+      ],
+      "family": "file",
+      "mode": "committed_error",
+      "observations": {
+        "complete": false,
+        "samples": [
+          4
+        ],
+        "terminal": true
+      },
+      "tool_ok": false,
+      "tool_status": "proxy-nested-failed",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": false,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        4
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        4
+      ],
+      "family": "file",
+      "mode": "committed_error",
+      "observations": {
+        "complete": true,
+        "samples": [
+          0,
+          4
+        ],
+        "terminal": true
+      },
+      "tool_ok": false,
+      "tool_status": "proxy-nested-failed",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": false,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": true
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0,
+        7,
+        4
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7,
+        4
+      ],
+      "family": "file",
+      "mode": "excursion",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        7,
+        4
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7,
+        4
+      ],
+      "family": "file",
+      "mode": "excursion",
+      "observations": {
+        "complete": false,
+        "samples": [
+          4
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        7,
+        4
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7,
+        4
+      ],
+      "family": "file",
+      "mode": "excursion",
+      "observations": {
+        "complete": true,
+        "samples": [
+          0,
+          7,
+          4
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": false
+        },
+        "simple_checker": {
+          "completion": true,
+          "endpoint_in_range": true,
+          "trajectory_in_range": false
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0,
+        7
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7
+      ],
+      "family": "file",
+      "mode": "wrong_final",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        7
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7
+      ],
+      "family": "file",
+      "mode": "wrong_final",
+      "observations": {
+        "complete": false,
+        "samples": [
+          7
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": false,
+          "endpoint_in_range": false,
+          "trajectory_in_range": false
+        },
+        "simple_checker": {
+          "completion": false,
+          "endpoint_in_range": false,
+          "trajectory_in_range": false
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        7
+      ],
+      "answerable": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        7
+      ],
+      "family": "file",
+      "mode": "wrong_final",
+      "observations": {
+        "complete": true,
+        "samples": [
+          0,
+          7
+        ],
+        "terminal": true
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": false,
+          "endpoint_in_range": false,
+          "trajectory_in_range": false
+        },
+        "simple_checker": {
+          "completion": false,
+          "endpoint_in_range": false,
+          "trajectory_in_range": false
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0,
+        1,
+        4
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        1,
+        4
+      ],
+      "family": "file",
+      "mode": "missing",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        1,
+        4
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        1,
+        4
+      ],
+      "family": "file",
+      "mode": "missing",
+      "observations": {
+        "complete": false,
+        "samples": [],
+        "terminal": false
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        1,
+        4
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        1,
+        4
+      ],
+      "family": "file",
+      "mode": "missing",
+      "observations": {
+        "complete": false,
+        "samples": [],
+        "terminal": false
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "trajectory"
+    },
+    {
+      "actual_commits": [
+        0,
+        1,
+        4
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        1,
+        4
+      ],
+      "family": "file",
+      "mode": "delayed",
+      "observations": {},
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "acknowledgement"
+    },
+    {
+      "actual_commits": [
+        0,
+        1,
+        4
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        1,
+        4
+      ],
+      "family": "file",
+      "mode": "delayed",
+      "observations": {
+        "complete": false,
+        "samples": [
+          1
+        ],
+        "terminal": false
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "terminal"
+    },
+    {
+      "actual_commits": [
+        0,
+        1,
+        4
+      ],
+      "answerable": {
+        "completion": false,
+        "endpoint_in_range": false,
+        "trajectory_in_range": false
+      },
+      "baseline_admitted": true,
+      "baseline_commits": [
+        0,
+        1,
+        4
+      ],
+      "family": "file",
+      "mode": "delayed",
+      "observations": {
+        "complete": false,
+        "samples": [
+          0,
+          1
+        ],
+        "terminal": false
+      },
+      "tool_ok": true,
+      "tool_status": "proxied-mediated",
+      "truth": {
+        "completion": true,
+        "endpoint_in_range": true,
+        "trajectory_in_range": true
+      },
+      "truth_agrees_across_executions": true,
+      "verdicts": {
+        "acknowledgement": {
+          "completion": true,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "guardian": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        },
+        "simple_checker": {
+          "completion": null,
+          "endpoint_in_range": null,
+          "trajectory_in_range": null
+        }
+      },
+      "view": "trajectory"
+    }
+  ],
+  "schema_version": 1,
+  "study": "observation-contract-pilot",
+  "summary": {
+    "file": {
+      "by_method": {
+        "acknowledgement": {
+          "actual_violations": 15,
+          "claims": 63,
+          "correctly_resolved_answerable": 4,
+          "false_confirmations": 6,
+          "false_denials": 3,
+          "missed_violations": 15,
+          "predicted_answerable": 26,
+          "unknown": 42
+        },
+        "guardian": {
+          "actual_violations": 15,
+          "claims": 63,
+          "correctly_resolved_answerable": 26,
+          "false_confirmations": 0,
+          "false_denials": 0,
+          "missed_violations": 6,
+          "predicted_answerable": 26,
+          "unknown": 37
+        },
+        "simple_checker": {
+          "actual_violations": 15,
+          "claims": 63,
+          "correctly_resolved_answerable": 26,
+          "false_confirmations": 0,
+          "false_denials": 0,
+          "missed_violations": 6,
+          "predicted_answerable": 26,
+          "unknown": 37
+        }
+      },
+      "by_view": {
+        "acknowledgement": {
+          "acknowledgement": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 0,
+            "false_confirmations": 2,
+            "false_denials": 1,
+            "missed_violations": 5,
+            "predicted_answerable": 0,
+            "unknown": 14
+          },
+          "guardian": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 0,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 5,
+            "predicted_answerable": 0,
+            "unknown": 21
+          },
+          "simple_checker": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 0,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 5,
+            "predicted_answerable": 0,
+            "unknown": 21
+          }
+        },
+        "terminal": {
+          "acknowledgement": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 2,
+            "false_confirmations": 2,
+            "false_denials": 1,
+            "missed_violations": 5,
+            "predicted_answerable": 11,
+            "unknown": 14
+          },
+          "guardian": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 11,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 1,
+            "predicted_answerable": 11,
+            "unknown": 10
+          },
+          "simple_checker": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 11,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 1,
+            "predicted_answerable": 11,
+            "unknown": 10
+          }
+        },
+        "trajectory": {
+          "acknowledgement": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 2,
+            "false_confirmations": 2,
+            "false_denials": 1,
+            "missed_violations": 5,
+            "predicted_answerable": 15,
+            "unknown": 14
+          },
+          "guardian": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 15,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 0,
+            "predicted_answerable": 15,
+            "unknown": 6
+          },
+          "simple_checker": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 15,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 0,
+            "predicted_answerable": 15,
+            "unknown": 6
+          }
+        }
+      },
+      "gateway_normal_completed": 1,
+      "guardian_normal_completed": 1,
+      "normal_tasks": 1
+    },
+    "joint": {
+      "by_method": {
+        "acknowledgement": {
+          "actual_violations": 15,
+          "claims": 63,
+          "correctly_resolved_answerable": 4,
+          "false_confirmations": 6,
+          "false_denials": 3,
+          "missed_violations": 15,
+          "predicted_answerable": 26,
+          "unknown": 42
+        },
+        "guardian": {
+          "actual_violations": 15,
+          "claims": 63,
+          "correctly_resolved_answerable": 26,
+          "false_confirmations": 0,
+          "false_denials": 0,
+          "missed_violations": 6,
+          "predicted_answerable": 26,
+          "unknown": 37
+        },
+        "simple_checker": {
+          "actual_violations": 15,
+          "claims": 63,
+          "correctly_resolved_answerable": 26,
+          "false_confirmations": 0,
+          "false_denials": 0,
+          "missed_violations": 6,
+          "predicted_answerable": 26,
+          "unknown": 37
+        }
+      },
+      "by_view": {
+        "acknowledgement": {
+          "acknowledgement": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 0,
+            "false_confirmations": 2,
+            "false_denials": 1,
+            "missed_violations": 5,
+            "predicted_answerable": 0,
+            "unknown": 14
+          },
+          "guardian": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 0,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 5,
+            "predicted_answerable": 0,
+            "unknown": 21
+          },
+          "simple_checker": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 0,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 5,
+            "predicted_answerable": 0,
+            "unknown": 21
+          }
+        },
+        "terminal": {
+          "acknowledgement": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 2,
+            "false_confirmations": 2,
+            "false_denials": 1,
+            "missed_violations": 5,
+            "predicted_answerable": 11,
+            "unknown": 14
+          },
+          "guardian": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 11,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 1,
+            "predicted_answerable": 11,
+            "unknown": 10
+          },
+          "simple_checker": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 11,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 1,
+            "predicted_answerable": 11,
+            "unknown": 10
+          }
+        },
+        "trajectory": {
+          "acknowledgement": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 2,
+            "false_confirmations": 2,
+            "false_denials": 1,
+            "missed_violations": 5,
+            "predicted_answerable": 15,
+            "unknown": 14
+          },
+          "guardian": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 15,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 0,
+            "predicted_answerable": 15,
+            "unknown": 6
+          },
+          "simple_checker": {
+            "actual_violations": 5,
+            "claims": 21,
+            "correctly_resolved_answerable": 15,
+            "false_confirmations": 0,
+            "false_denials": 0,
+            "missed_violations": 0,
+            "predicted_answerable": 15,
+            "unknown": 6
+          }
+        }
+      },
+      "gateway_normal_completed": 1,
+      "guardian_normal_completed": 1,
+      "normal_tasks": 1
+    }
+  }
+}

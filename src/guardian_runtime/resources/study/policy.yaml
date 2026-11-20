@@ -1,0 +1,11 @@
+version: "observation-1"
+default: deny
+rules:
+  - id: admitted-operation
+    effect: allow
+    subject: study-agent
+    tool: study
+    purpose: [study]
+    state: {ready: true}
+    params:
+      target: {required: true, min: 0, max: 5}

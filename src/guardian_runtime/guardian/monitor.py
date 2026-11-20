@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import logging
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
+from copy import deepcopy
 from dataclasses import replace
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
+from guardian_runtime.adapters import EffectObserver
 from guardian_runtime.canonical import CanonicalizationError, canonicalize_request, digest_json, normalize_json
 from guardian_runtime.capabilities import CapabilityStore
 from guardian_runtime.crypto import sign_object
@@ -35,16 +37,19 @@ class GuardianRuntime:
         permit_ttl_seconds: int = 5,
         logger: logging.Logger | None = None,
         mediate_nested_actions: bool = False,
+        composite_actions: tuple[str, ...] | None = None,
+        observer: EffectObserver | None = None,
     ) -> None:
         if type(permit_ttl_seconds) is not int or permit_ttl_seconds <= 0:
             raise ValueError("permit_ttl_seconds must be a positive integer")
         self.capabilities = capabilities
         self.policy = policy
         self.environment = environment
+        self.observer = observer
         self.signing_key = signing_key
         self.public_key = signing_key.public_key()
         self.runtime_manifest_hash = runtime_manifest_hash
-        self.evidence = EvidenceLog(signing_key, runtime_manifest_hash)
+        self.evidence = EvidenceLog(signing_key, runtime_manifest_hash, lock=capabilities.transaction_lock)
         self.clock = clock or (lambda: int(time.time()))
         self.permit_ttl_seconds = permit_ttl_seconds
         self.logger = logger or logging.getLogger("guardian_runtime.runtime")
@@ -61,6 +66,7 @@ class GuardianRuntime:
             runtime_manifest_hash=runtime_manifest_hash,
             on_execution=self._record_executed_action,
             mediate_nested_actions=mediate_nested_actions,
+            composite_actions=composite_actions,
             execution_policy_check=self._revalidate_execution,
         )
         if mediate_nested_actions:
@@ -106,8 +112,20 @@ class GuardianRuntime:
             permit=permit,
             normalized_request=request,
         )
+        observation = None
+        if self.observer is not None:
+            try:
+                # The observer cannot mutate the signed request or the returned result.
+                values = self.observer.read(deepcopy(request), deepcopy(result))
+                if not isinstance(values, Mapping):
+                    raise ValueError("observer readings must be an object")
+                observation = {"source": self.observer.source, "readings": normalize_json(values, max_depth=64)}
+            except Exception:
+                observation = {"source": self.observer.source, "readings": None}
         self.evidence.append(
             timestamp=self.clock(),
+            parent_permit_id=self.gateway.parent_permit_id,
+            observation=observation,
             request=original_request,
             decision=decision,
             policy_version=permit.policy_version,
@@ -132,6 +150,7 @@ class GuardianRuntime:
         self.evidence.append(
             timestamp=self.clock(),
             request=request,
+            parent_permit_id=self.gateway.parent_permit_id,
             decision=decision,
             policy_version=self.policy.version,
             result=None,

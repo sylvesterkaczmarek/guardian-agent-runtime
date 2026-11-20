@@ -26,6 +26,8 @@ class SandboxEnvironment:
     the resulting privileged action back through Guardian authorization.
     """
 
+    composite_actions = ("proxy_call",)
+
     def __init__(self) -> None:
         self.state = SandboxState()
 

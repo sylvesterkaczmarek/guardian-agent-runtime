@@ -3,6 +3,7 @@ include requirements.txt requirements-dev.txt requirements.lock
 recursive-include docs *.md
 recursive-include configs *.yaml
 recursive-include tests *.py
+include tests/fixtures/evidence-0.4.1.json
 recursive-include experiments *.py
 recursive-include scripts *.py
 recursive-include formal *.py *.tla *.cfg

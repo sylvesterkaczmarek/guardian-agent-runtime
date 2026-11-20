@@ -12,7 +12,13 @@ The central research question is:
 
 > How much security can an independent runtime reference monitor provide when the agent it supervises cannot itself be trusted?
 
-## Version 0.4.1
+## Development version and observed outcomes
+
+Install this checkout with `python -m pip install .` and run `guardian-study --output pilot`. The offline study compares tool acknowledgements with independently observed effects in a file worker and a simulated joint. An acknowledged write that did nothing fails the completion check. A committed write followed by a tool error retains both facts.
+
+Guardian and a simple checker with the same observations tied on the pilot. Across both backends they correctly resolved all 52 claims predicted to be answerable, made zero false confirmations and returned unknown for 74 of 126 claim decisions. The development version adds a versioned adapter contract, a deployment constructor, linked v2 evidence and an optional Inspect AI task. [Run the study or integrate a tool](docs/observed-outcomes.md)
+
+## Published v0.4.1 baseline
 
 **0.4.1 is published on GitHub and PyPI.** All 413 tests passed, including a fresh
 installation of the public package, and its hashes match the verified release.
@@ -237,7 +243,7 @@ The `prompt_injection`, `indirect_prompt_injection`, and `tool_output_poisoning`
 
 `evidence_completeness` measures external mediated requests that leave at least one evidence event, with recursive nested evidence capped at one covered external request. `capability_overprivilege_rate` measures the fraction of adversarial action proposals whose presented capability alone authorizes the canonical request before policy and invariant checks. `policy_coverage` measures the fraction of external requests that reach an explicit policy rule. Internal recursive mediation does not inflate either coverage metric.
 
-Evidence coverage matches records to each request individually. Capability-only measurements exclude lifecycle, audit-tamper, delegation and rate-window harnesses. Benign completion requires every requested step to succeed. Latency measurements exclude runtime construction and request preparation.
+Evidence coverage matches records to each request individually. Capability-only measurements exclude lifecycle, audit-tamper, delegation and rate-window harnesses. Benign completion checks every requested step against its observed task postcondition. The result records the tool acknowledgement separately. Latency measurements exclude runtime construction and request preparation.
 
 All execution is confined to bundled local simulators. The network tool records `mock://` targets and does not perform external networking.
 
