@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+- Give PyPI readers absolute links to the archived pilot and its citation metadata. The observed-outcomes study and results are identical to 0.5.0.
+
 ## 0.5.0
 
 - Score benign reference tasks against observed state and report acknowledgements separately.

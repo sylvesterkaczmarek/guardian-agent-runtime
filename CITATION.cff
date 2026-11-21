@@ -8,6 +8,16 @@ authors:
 license: MIT
 repository-code: "https://github.com/sylvesterkaczmarek/guardian-agent-runtime"
 url: "https://github.com/sylvesterkaczmarek/guardian-agent-runtime"
-version: "0.5.0"
+version: "0.5.1"
 date-released: "2026-11-21"
-doi: "10.5281/zenodo.24409069"
+preferred-citation:
+  type: software
+  title: "Guardian Agent Runtime"
+  authors:
+    - family-names: Kaczmarek
+      given-names: Sylvester
+  version: "0.5.0"
+  year: 2026
+  publisher:
+    name: Zenodo
+  doi: "10.5281/zenodo.24409069"
