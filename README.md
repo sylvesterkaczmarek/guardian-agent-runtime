@@ -12,14 +12,12 @@ A file worker can acknowledge a write and leave the file untouched. It can also 
 
 ## Run the observed-outcomes pilot
 
-From a shell with Git and Python 3.12 or later installed, run the following on macOS or Linux. The pilot runs locally without a model account.
+From a shell with Python 3.12 or later installed, run the following on macOS or Linux. The pilot runs locally without a model account.
 
 ```bash
-git clone https://github.com/sylvesterkaczmarek/guardian-agent-runtime.git
-cd guardian-agent-runtime
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install .
+python -m pip install guardian-runtime-assurance==0.5.0
 guardian-study --output pilot
 ```
 
@@ -27,11 +25,11 @@ The command prints scores for the file worker and a simulated joint. It writes t
 
 **Pilot result.** With the same recorded observations, Guardian and a simple checker agreed on every verdict. Each correctly resolved all 52 claims the protocol predicted were answerable, returned unknown for 74 of 126 decisions and made zero false confirmations. Twelve of the unknowns were actual violations. Guardian's signed record lets another party verify which authorised operation produced each observation. The experiment covers one implementation per backend.
 
-[Study protocol](docs/observation-study-protocol.md) · [Case-level results](results/observation_pilot.json) · [Integrate a tool or run an Inspect solver](docs/observed-outcomes.md) · [Citation](CITATION.cff)
+[Two-page research note](docs/observation-pilot.pdf) · [Study protocol](docs/observation-study-protocol.md) · [Case-level results](results/observation_pilot.json) · [Integrate a tool or run an Inspect solver](docs/observed-outcomes.md) · [Citation](CITATION.cff)
 
 ## Published v0.4.1 baseline
 
-The pilot and Inspect task are available from the GitHub checkout. For the earlier published benchmark, install the pinned PyPI distribution.
+Version 0.5.0 includes the pilot and Inspect task. For the earlier published benchmark, install the pinned PyPI distribution.
 
 ```bash
 python -m pip install guardian-runtime-assurance==0.4.1
@@ -306,8 +304,6 @@ Both models assume atomic execution and evidence append. They do not verify Pyth
 Python 3.12 or later is required.
 
 ```bash
-git clone https://github.com/sylvesterkaczmarek/guardian-agent-runtime.git
-cd guardian-agent-runtime
 python -m venv .venv
 source .venv/bin/activate
 make install
@@ -457,9 +453,9 @@ The checked reference dependency inventory and dependency graph are in [`results
 
 ## Cite this repository
 
-When citing the development pilot, include the Git commit printed by `git rev-parse HEAD` so readers can reproduce the same revision. [Citation metadata](CITATION.cff)
+For the observed-outcomes pilot, cite version 0.5.0. [Citation metadata](CITATION.cff)
 
-> Kaczmarek, S. (2026). *Guardian Agent Runtime*. GitHub. https://github.com/sylvesterkaczmarek/guardian-agent-runtime
+> Kaczmarek, S. (2026). *Guardian Agent Runtime* (v0.5.0). GitHub. https://github.com/sylvesterkaczmarek/guardian-agent-runtime
 
 ```bibtex
 @software{Kaczmarek_2026_Guardian_Agent_Runtime,

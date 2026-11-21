@@ -1,6 +1,7 @@
 include CHANGELOG.md LICENSE README.md CITATION.cff SECURITY.md Makefile Dockerfile
 include requirements.txt requirements-dev.txt requirements.lock
 recursive-include docs *.md
+include docs/observation-pilot.pdf docs/observation-pilot.html
 recursive-include configs *.yaml
 recursive-include tests *.py
 include tests/fixtures/evidence-0.4.1.json

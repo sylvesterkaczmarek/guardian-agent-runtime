@@ -2,7 +2,7 @@
 
 ## Run the offline experiment
 
-From the development checkout, run `python -m pip install .`, then `guardian-study --output pilot`. The same command works after installing the development wheel. Add `--timing` for host-specific p95 timing. The output includes a paired JSON report and one signed sample bundle, manifest and example public key for each backend. The reference examples use published deterministic signing keys. Integrations supply their own trusted keys.
+Install with `python -m pip install guardian-runtime-assurance==0.5.0`, then run `guardian-study --output pilot`. Add `--timing` for host-specific p95 timing. The output includes a paired JSON report and one signed sample bundle, manifest and example public key for each backend. The reference examples use published deterministic signing keys. Integrations supply their own trusted keys.
 
 The experiment covers a discrete joint simulator and a subprocess that commits values to a disposable file. Each parent operation has two separately authorised children. A reader in the parent process observes committed file bytes after each synchronised transition. The scorer retains the full history. Guardian receives only the projection declared by the observer. Evidence about a trajectory applies to this discrete observation model. The pilot makes no claim about continuous physical motion or disk crash durability.
 

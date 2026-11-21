@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased 0.5 development
+## 0.5.0
 
 - Score benign reference tasks against observed state and report acknowledgements separately.
 - Bind tool builds and permit lifetimes in signed manifests. Link composed calls and observer readings in v2 evidence, with v1 verification retained.

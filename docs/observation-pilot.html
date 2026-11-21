@@ -1,0 +1,150 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>What a tool acknowledgement can establish</title><meta name="author" content="Sylvester Kaczmarek"><style>@page{size:A4;margin:18mm 23mm 20mm;@bottom-right{content:counter(page) " / 2";font:9pt sans-serif;color:#48626b}}body{font:11pt/1.33 'Liberation Serif',serif;color:#172d34}header{font:26pt/1.12 'Liberation Serif',serif;margin:9pt 0}h1{font: bold 15pt 'Liberation Serif',serif;margin:15pt 0 4pt}strong{font: bold 9pt 'Liberation Sans',sans-serif;color:#14686d;letter-spacing:1pt}p{margin:7pt 0}td,th{padding:4pt 5pt;border-bottom:0.5pt solid #cad6d8}th{background:#e4efed}table{width:100%;border-collapse:collapse;font:9.5pt/1.3 'Liberation Sans',sans-serif}pre{font-size:9pt;background:#edf2f2;padding:7pt}code{font-size:.88em}a{color:#166268}.next{break-before:page}</style><body><p><span><strong>GUARDIAN AGENT RUNTIME / RESEARCH NOTE
+0.5.0</strong></span></p>
+<header>What a tool acknowledgement can establish</header>
+<p><span>Sylvester Kaczmarek</span> · 21 November 2026</p>
+<p>A worker can acknowledge a write and leave the destination untouched.
+It can also write the requested value and then return an error. An agent
+that equates acknowledgement with completion will get both cases wrong.
+This pilot asks which claims an evaluator can decide when given a tool
+response, a final observation or a record of each committed state.</p>
+<h1 class="unnumbered" id="two-tools-and-three-claims">Two tools and
+three claims</h1>
+<p>A joint simulator moved towards position 3. A subprocess file worker
+committed the integer 4 to a disposable file. Each workflow used a
+parent request and two separately authorised child operations. For the
+file worker, a reader in the parent process reopened the destination
+between synchronised updates. The evaluation retained the full discrete
+history as ground truth. Each checker received only its assigned
+view.</p>
+<p>The three claims concerned (1) whether the final value equalled the
+target, (2) whether it was within the inclusive range 0 to 5, and (3)
+whether every committed value stayed in that range. For example, a
+trajectory of <span class="math inline">0, 7, 4</span> satisfies the
+file goal and endpoint bound but violates the trajectory bound. A reader
+that sees only the final 4 can establish the first two claims. The third
+remains unknown.</p>
+<h1 class="unnumbered" id="frozen-predictions">Frozen predictions</h1>
+<p>Seven conditions per tool covered normal completion, acknowledged
+no-op, committed change followed by error, temporary excursion, wrong
+final value, missing observations and delayed observations. Each
+condition was evaluated through three views. With two tools and three
+claims per view, the pilot yielded 126 claim decisions across 42
+executions.</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Evidence</th>
+<th style="text-align: left;">Predicted scope of a verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Acknowledgement alone</td>
+<td style="text-align: left;">Provides the reported status. All three
+state claims remain unknown.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fresh terminal sample</td>
+<td style="text-align: left;">Decides both final-state claims. A value
+outside the bound also refutes the trajectory claim.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Complete transition history</td>
+<td style="text-align: left;">Decides all three claims within the
+discrete observation model.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Stale or partial observations</td>
+<td style="text-align: left;">An observed breach refutes the trajectory
+claim. A missing final sample leaves final-state claims unknown.</td>
+</tr>
+</tbody>
+</table>
+<p class="next"><span><strong>OBSERVED OUTCOMES / RESULTS</strong></span></p>
+<h1 class="unnumbered"
+id="the-same-observations-yielded-the-same-verdicts">The same
+observations yielded the same verdicts</h1>
+<p>The acknowledgement baseline treated tool success as completion and
+abstained on the range claims. The simple checker and Guardian
+interpreted identical recorded samples. Guardian additionally verified
+the signed evidence and linked the observed child operation to its
+authorised parent.</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Across both tools</th>
+<th style="text-align: right;">Ack. baseline</th>
+<th style="text-align: right;">Simple checker</th>
+<th style="text-align: right;">Guardian</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Correct on 52 predicted-answerable
+claims</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">52</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">False confirmations</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">False denials</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Unknown verdicts (out of 126)</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">74</td>
+<td style="text-align: right;">74</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Actual violations missed (out of 30)</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+</tr>
+</tbody>
+</table>
+<p>Guardian and the simple checker agreed on every verdict. Twelve of
+their 74 unknowns were actual violations. An unknown verdict therefore
+cannot be counted as a safe outcome. Both admission systems also refused
+the out-of-range and unavailable-state controls before the tool ran.</p>
+<h1 class="unnumbered" id="what-the-pilot-supports">What the pilot
+supports</h1>
+<p>The frozen protocol predicted when the available observations would
+settle a claim. Signed records gave a separate verifier a way to
+authenticate the recorded observations and their association with a
+particular authorised operation. Greater verdict accuracy over the
+equal-information checker would require additional evidence. The
+prespecified superiority criterion was unmet.</p>
+<p>There was one implementation per backend. Repeated views and claims
+from a single implementation are dependent. These counts cannot
+establish performance on other tools or a population-level error rate.
+The study covers discrete transitions and a trusted observer. A
+signature establishes who attested to a reading. Sensor accuracy,
+continuous physical motion and crash durability require separate
+tests.</p>
+<h1 class="unnumbered" id="reproduce-the-result">Reproduce the
+result</h1>
+<p>Use Python 3.12 or later in a fresh environment. Run the following
+commands, then compare <code>pilot/report.json</code> with the
+case-level results in the release.</p>
+<pre><code>python -m pip install guardian-runtime-assurance==0.5.0
+guardian-study --output pilot</code></pre>
+<p>The output includes a manifest, example public key and signed
+evidence bundle per backend. The example keys are public fixtures. Use
+the <a
+href="https://github.com/sylvesterkaczmarek/guardian-agent-runtime/blob/v0.5.0/docs/observed-outcomes.md">verification
+commands</a>, <a
+href="https://github.com/sylvesterkaczmarek/guardian-agent-runtime/blob/v0.5.0/docs/observation-study-protocol.md">frozen
+protocol</a> and <a
+href="https://github.com/sylvesterkaczmarek/guardian-agent-runtime/blob/v0.5.0/results/observation_pilot.json">case-level
+results</a> to inspect any verdict.</p>
+</body></html>

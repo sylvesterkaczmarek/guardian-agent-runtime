@@ -1,6 +1,6 @@
 # Publication status
 
-## Current release
+## Historical v0.4.1 release
 
 Guardian Agent Runtime **0.4.1** is published on GitHub and PyPI.
 The PyPI distribution is **`guardian-runtime-assurance`**; the repository remains
