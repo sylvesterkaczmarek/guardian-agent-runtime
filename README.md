@@ -478,11 +478,3 @@ For the observed-outcomes pilot, cite version 0.5.0. [Citation metadata](https:/
 MIT. See [LICENSE](LICENSE).
 
 © **Sylvester Kaczmarek** · [https://www.sylvesterkaczmarek.com](https://www.sylvesterkaczmarek.com)
-
-## November verified release
-
-Version 0.4.0 includes independent temporal-rule regression checks. See
-[the release notes](docs/release-0.4.0.md) and
-[the independent review](docs/independent-review-2026-11-05.md).
-GitHub release artifacts and PyPI publication have separate verification jobs;
-check their actual workflow status before assuming package-index availability.
