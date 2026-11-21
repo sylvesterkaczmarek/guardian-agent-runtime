@@ -1,6 +1,7 @@
 """Package identity must distinguish this project from unrelated PyPI software."""
 
 import json
+import re
 from pathlib import Path
 import tomllib
 
@@ -48,3 +49,13 @@ def test_supply_chain_artifacts_use_project_distribution():
     assert sbom["packages"][0]["versionInfo"] == project["version"]
     citation = yaml.safe_load((ROOT / "CITATION.cff").read_text())
     assert citation["version"] == project["version"]
+
+
+def test_pypi_description_links_to_the_preferred_pilot_citation():
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+    description = (ROOT / project["readme"]).read_text()
+    citation = yaml.safe_load((ROOT / "CITATION.cff").read_text())["preferred-citation"]
+    assert project["urls"]["Pilot DOI"] == f"https://doi.org/{citation['doi']}"
+    assert project["urls"]["Pilot DOI"] in description
+    assert f"[Citation metadata]({project['urls']['Citation metadata']})" in description
+    assert all(link.startswith("https://") for link in re.findall(r"\]\(([^)]+)\)", description))

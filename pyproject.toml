@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "guardian-runtime-assurance"
-version = "0.5.0"
+version = "0.5.1"
 description = "Reference monitor and adversarial benchmark for securing privileged actions by agentic systems."
-readme = "README.md"
+readme = "docs/pypi.md"
 requires-python = ">=3.12"
 license = "MIT"
 authors = [{name = "Sylvester Kaczmarek"}]
@@ -18,6 +18,8 @@ dependencies = [
 ]
 
 [project.urls]
+"Pilot DOI" = "https://doi.org/10.5281/zenodo.24409069"
+"Citation metadata" = "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/blob/59bdeef7c509068b6f628f7ab5e2c61fa6161fac/CITATION.cff"
 Repository = "https://github.com/sylvesterkaczmarek/guardian-agent-runtime"
 Issues = "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/issues"
 Changelog = "https://github.com/sylvesterkaczmarek/guardian-agent-runtime/blob/main/CHANGELOG.md"

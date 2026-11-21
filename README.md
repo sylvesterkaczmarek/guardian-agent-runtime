@@ -21,7 +21,7 @@ From a shell with Python 3.12 or later installed, run the following on macOS or 
 ```bash
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install guardian-runtime-assurance==0.5.0
+python -m pip install guardian-runtime-assurance==0.5.1
 guardian-study --output pilot
 ```
 
@@ -29,7 +29,7 @@ The command prints scores for the file worker and a simulated joint. It writes t
 
 **Pilot result.** With the same recorded observations, Guardian and a simple checker agreed on every verdict. Each correctly resolved all 52 claims the protocol predicted were answerable, returned unknown for 74 of 126 decisions and made zero false confirmations. Twelve of the unknowns were actual violations. Guardian's signed record lets another party verify which authorised operation produced each observation. The experiment covers one implementation per backend.
 
-[Two-page research note](docs/observation-pilot.pdf) · [Study protocol](docs/observation-study-protocol.md) · [Case-level results](results/observation_pilot.json) · [Integrate a tool or run an Inspect solver](docs/observed-outcomes.md) · [Citation](CITATION.cff)
+[Two-page research note](docs/observation-pilot.pdf) · [Study protocol](docs/observation-study-protocol.md) · [Case-level results](results/observation_pilot.json) · [Integrate a tool or run an Inspect solver](docs/observed-outcomes.md) · [Citation](https://github.com/sylvesterkaczmarek/guardian-agent-runtime/blob/59bdeef7c509068b6f628f7ab5e2c61fa6161fac/CITATION.cff)
 
 ## Published v0.4.1 baseline
 
@@ -457,7 +457,7 @@ The checked reference dependency inventory and dependency graph are in [`results
 
 ## Cite this repository
 
-For the observed-outcomes pilot, cite version 0.5.0. [Citation metadata](CITATION.cff)
+For the observed-outcomes pilot, cite version 0.5.0. [Citation metadata](https://github.com/sylvesterkaczmarek/guardian-agent-runtime/blob/59bdeef7c509068b6f628f7ab5e2c61fa6161fac/CITATION.cff)
 
 > Kaczmarek, S. (2026). *Guardian Agent Runtime* (v0.5.0) [Software]. Zenodo. [10.5281/zenodo.24409069](https://doi.org/10.5281/zenodo.24409069)
 
