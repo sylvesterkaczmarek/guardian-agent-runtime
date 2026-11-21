@@ -1,5 +1,9 @@
 # Publication status
 
+## Version 0.5.0
+
+The [Zenodo release record](https://doi.org/10.5281/zenodo.24409069) archives source revision `2677c8e4eded935d716fa9dc0cdadd44bf9b0463`, the frozen protocol, the case-level results and the research note. The version on [PyPI](https://pypi.org/project/guardian-runtime-assurance/0.5.0/) reproduced the reference report with SHA-256 `55de396fc8a455d1b2160b01c256cf6a9acda7f05a586b75a4291932f5da9613`. [Release checks](https://github.com/sylvesterkaczmarek/guardian-agent-runtime/actions/runs/44845115636)
+
 ## Historical v0.4.1 release
 
 Guardian Agent Runtime **0.4.1** is published on GitHub and PyPI.

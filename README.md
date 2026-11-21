@@ -10,6 +10,10 @@ Guardian checks an agent's proposed tool call against its permissions, runtime p
 
 A file worker can acknowledge a write and leave the file untouched. It can also commit the write and then report an error. The offline pilot reproduces both cases and lets you inspect the evidence for each outcome.
 
+**Cite the pilot**
+
+Kaczmarek, S. (2026). *Guardian Agent Runtime* (v0.5.0) [Software]. Zenodo. [10.5281/zenodo.24409069](https://doi.org/10.5281/zenodo.24409069)
+
 ## Run the observed-outcomes pilot
 
 From a shell with Python 3.12 or later installed, run the following on macOS or Linux. The pilot runs locally without a model account.
@@ -455,14 +459,17 @@ The checked reference dependency inventory and dependency graph are in [`results
 
 For the observed-outcomes pilot, cite version 0.5.0. [Citation metadata](CITATION.cff)
 
-> Kaczmarek, S. (2026). *Guardian Agent Runtime* (v0.5.0). GitHub. https://github.com/sylvesterkaczmarek/guardian-agent-runtime
+> Kaczmarek, S. (2026). *Guardian Agent Runtime* (v0.5.0) [Software]. Zenodo. [10.5281/zenodo.24409069](https://doi.org/10.5281/zenodo.24409069)
 
 ```bibtex
 @software{Kaczmarek_2026_Guardian_Agent_Runtime,
   author = {Sylvester Kaczmarek},
   title  = {{Guardian Agent Runtime}},
   year   = {2026},
-  url    = {https://github.com/sylvesterkaczmarek/guardian-agent-runtime}
+  version = {0.5.0},
+  publisher = {Zenodo},
+  doi = {10.5281/zenodo.24409069},
+  url = {https://doi.org/10.5281/zenodo.24409069}
 }
 ```
 
