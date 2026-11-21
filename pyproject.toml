@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "guardian-runtime-assurance"
-version = "0.5.0.dev0"
+version = "0.5.0"
 description = "Reference monitor and adversarial benchmark for securing privileged actions by agentic systems."
 readme = "README.md"
 requires-python = ">=3.12"
